@@ -571,26 +571,16 @@ end:
 void on_keypress(XKeyEvent *kev)
 {
 	int i;
-	unsigned int sh = 0;
-	KeySym ksym, shksym;
-	char dummy, key;
+	KeySym ksym;
+	char key;
 	bool dirty = false;
 
 	XLookupString(kev, &key, 1, &ksym, NULL);
 
-	if (kev->state & ShiftMask) {
-		kev->state &= ~ShiftMask;
-		XLookupString(kev, &dummy, 1, &shksym, NULL);
-		kev->state |= ShiftMask;
-		if (ksym != shksym)
-			sh = ShiftMask;
-	}
-	if (IsModifierKey(ksym))
-		return;
 	if (ksym == XK_Escape && MODMASK(kev->state) == 0) {
 		extprefix = False;
 	} else if (extprefix) {
-		run_key_handler(XKeysymToString(ksym), kev->state & ~sh);
+		run_key_handler(XKeysymToString(ksym), kev->state);
 		extprefix = False;
 	} else if (key >= '0' && key <= '9') {
 		/* number prefix for commands */
@@ -598,7 +588,7 @@ void on_keypress(XKeyEvent *kev)
 		return;
 	} else for (i = 0; i < ARRLEN(keys); i++) {
 		if (keys[i].ksym == ksym &&
-		    MODMASK(keys[i].mask | sh) == MODMASK(kev->state) &&
+		    MODMASK(keys[i].mask) == MODMASK(kev->state) &&
 		    keys[i].cmd >= 0 && keys[i].cmd < CMD_COUNT &&
 		    (cmds[keys[i].cmd].mode < 0 || cmds[keys[i].cmd].mode == mode))
 		{
