@@ -20,7 +20,6 @@
 #define _WINDOW_CONFIG
 #include "config.h"
 #include "icon/data.h"
-#include "utf8.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +28,7 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 #include <X11/Xresource.h>
+#include <X11/Xutil.h>
 
 #define RES_CLASS "Nsxiv"
 
@@ -47,15 +47,34 @@ static struct {
 
 static GC gc;
 
-static XftFont *font;
-static int fontheight;
-static double fontsize;
 static int barheight;
 
 Atom atoms[ATOM_COUNT];
 
+
+const char* win_res(XrmDatabase db, const char *name, const char *def)
+{
+	char *type;
+	XrmValue ret;
+
+	if (db != None &&
+		XrmGetResource(db, name, name, &type, &ret) &&
+		STREQ(type, "String"))
+	{
+		return ret.addr;
+	} else {
+		return def;
+	}
+}
+
+#if HAVE_LIBXFT
+#include <X11/Xft/Xft.h>
+#include "utf8.h"
+static XftFont *font;
+static double fontsize;
 void win_init_font(const win_env_t *e, const char *fontstr)
 {
+	static int fontheight;
 	if ((font = XftFontOpenName(e->dpy, e->scr, fontstr)) == NULL)
 		error(EXIT_FAILURE, 0, "Error loading font '%s'", fontstr);
 	fontheight = font->ascent + font->descent;
@@ -64,42 +83,73 @@ void win_init_font(const win_env_t *e, const char *fontstr)
 	XftFontClose(e->dpy, font);
 }
 
-void win_alloc_color(const win_env_t *e, const char *name, XftColor *col)
+void win_alloc_color(const win_env_t *e, const char *name, unsigned long* pixel)
 {
-	if (!XftColorAllocName(e->dpy, e->vis,
-	                       e->cmap, name, col))
+	XftColor col;
+	if(!name)
+		return;
+	if (!XftColorAllocName(e->dpy, e->vis, e->cmap, name, &col))
 	{
 		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
 	}
+	*pixel =  col.pixel;
+	XftColorFree(e->dpy, e->vis, e->cmap, &col);
 }
 
-const char* win_res(XrmDatabase db, const char *name, const char *def)
-{
-	char *type;
-	XrmValue ret;
+void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
-	if (db != None &&
-	    XrmGetResource(db, name, name, &type, &ret) &&
-	    STREQ(type, "String"))
-	{
-		return ret.addr;
-	} else {
-		return def;
-	}
+	const char *win_bg, *win_fg, *bar_bg, *bar_fg, *mrk_fg, *f;
+
+	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
+		error(0, 0, "No locale support");
+
+	XrmInitialize();
+
+	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
+	win_init_font(e, f);
+
+	win_bg = win_res(db, RES_CLASS ".window.background", NULL);
+	win_fg = win_res(db, RES_CLASS ".window.foreground", NULL);
+	bar_bg = win_res(db, RES_CLASS ".bar.background", win_fg);
+	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_bg);
+	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", win_fg);
+
+	win_alloc_color(e, win_bg, &win->win_bg);
+	win_alloc_color(e, win_fg, &win->win_fg);
+	win_alloc_color(e, bar_bg, &win->bar_bg);
+	win_alloc_color(e, bar_fg, &win->bar_fg);
+	win_alloc_color(e, mrk_fg, &win->mrk_fg);
+
+	win->bar.l.size = BAR_L_LEN;
+	win->bar.r.size = BAR_R_LEN;
+	/* 3 padding bytes needed by utf8_decode */
+	win->bar.l.buf = emalloc(win->bar.l.size + 3);
+	win->bar.l.buf[0] = '\0';
+	win->bar.r.buf = emalloc(win->bar.r.size + 3);
+	win->bar.r.buf[0] = '\0';
+	win->bar.h = options->hide_bar ? 0 : barheight;
+
 }
+#else
+void set_from_hex_string_if_present(XrmDatabase db, const char *name, unsigned long *dest) {
+	const char* hex = win_res(db, RES_CLASS ".window.background", NULL);
+    if (hex && hex[0] == '#') {
+        *dest = strtol(hex+1, NULL, 16);
+    }
+}
+#endif
+
 
 #define INIT_ATOM_(atom) \
 	atoms[ATOM_##atom] = XInternAtom(e->dpy, #atom, False);
-
 void win_init(win_t *win)
 {
 	win_env_t *e;
-	const char *win_bg, *win_fg, *bar_bg, *bar_fg, *mrk_fg, *f;
-	char *res_man;
-	XrmDatabase db;
 	XVisualInfo vis;
 	XWindowAttributes attr;
 	Window parent;
+	XrmDatabase db;
+	char *res_man;
 
 	memset(win, 0, sizeof(win_t));
 
@@ -120,39 +170,28 @@ void win_init(win_t *win)
 		e->depth = attr.depth;
 	}
 
+
 	XMatchVisualInfo(e->dpy, e->scr, e->depth, TrueColor, &vis);
 	e->vis = vis.visual;
 	e->cmap = XCreateColormap(e->dpy, parent, e->vis, None);
 
-	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
-		error(0, 0, "No locale support");
+	win->win_bg = DEFAULT_WIN_BG;
+	win->win_fg = DEFAULT_WIN_FG;
+	win->mrk_fg = DEFAULT_MARK_FG;
 
-	XrmInitialize();
 	res_man = XResourceManagerString(e->dpy);
 	db = res_man != NULL ? XrmGetStringDatabase(res_man) : None;
 
-	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
-	win_init_font(e, f);
+#if HAVE_LIBXFT
+	win->bar_bg = DEFAULT_WIN_FG;
+	win->bar_fg = DEFAULT_WIN_BG;
+	xft_init(e, win, db);
+#else
+	set_from_hex_string_if_present(db, RES_CLASS ".window.background", &win->win_bg);
+	set_from_hex_string_if_present(db, RES_CLASS ".window.foreground", &win->win_fg);
+	set_from_hex_string_if_present(db, RES_CLASS ".mark.foreground", &win->mrk_fg);
+#endif
 
-	win_bg = win_res(db, RES_CLASS ".window.background", "white");
-	win_fg = win_res(db, RES_CLASS ".window.foreground", "black");
-	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
-	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
-	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", win_fg);
-	win_alloc_color(e, win_bg, &win->win_bg);
-	win_alloc_color(e, win_fg, &win->win_fg);
-	win_alloc_color(e, bar_bg, &win->bar_bg);
-	win_alloc_color(e, bar_fg, &win->bar_fg);
-	win_alloc_color(e, mrk_fg, &win->mrk_fg);
-
-	win->bar.l.size = BAR_L_LEN;
-	win->bar.r.size = BAR_R_LEN;
-	/* 3 padding bytes needed by utf8_decode */
-	win->bar.l.buf = emalloc(win->bar.l.size + 3);
-	win->bar.l.buf[0] = '\0';
-	win->bar.r.buf = emalloc(win->bar.r.size + 3);
-	win->bar.r.buf[0] = '\0';
-	win->bar.h = options->hide_bar ? 0 : barheight;
 
 	INIT_ATOM_(WM_DELETE_WINDOW);
 	INIT_ATOM_(_NET_WM_NAME);
@@ -304,9 +343,9 @@ void win_open(win_t *win)
 
 	win->buf.w = e->scrw;
 	win->buf.h = e->scrh;
-	win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
-	                            win->buf.w, win->buf.h, e->depth);
-	XSetForeground(e->dpy, gc, win->win_bg.pixel);
+	win->buf.pm = XCreatePixmap(e->dpy, win->xwin, win->buf.w, win->buf.h, e->depth);
+
+	XSetForeground(e->dpy, gc, win->win_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 	XSetWindowBackgroundPixmap(e->dpy, win->xwin, win->buf.pm);
 
@@ -385,17 +424,17 @@ void win_clear(win_t *win)
 		XFreePixmap(e->dpy, win->buf.pm);
 		win->buf.w = MAX(win->buf.w, win->w);
 		win->buf.h = MAX(win->buf.h, win->h + win->bar.h);
-		win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
-		                            win->buf.w, win->buf.h, e->depth);
+		win->buf.pm = XCreatePixmap(e->dpy, win->xwin, win->buf.w, win->buf.h, e->depth);
 	}
-	XSetForeground(e->dpy, gc, win->win_bg.pixel);
+	XSetForeground(e->dpy, gc, win->win_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 }
 
+#if HAVE_LIBXFT
 #define TEXTWIDTH(win, text, len) \
 	win_draw_text(win, NULL, NULL, 0, 0, text, len, 0)
 
-int win_draw_text(win_t *win, XftDraw *d, const XftColor *color, int x, int y,
+int win_draw_text(win_t *win, XftDraw *d, const unsigned long *color, int x, int y,
                   char *text, int len, int w)
 {
 	int err, tw = 0;
@@ -420,7 +459,8 @@ int win_draw_text(win_t *win, XftDraw *d, const XftColor *color, int x, int y,
 		XftTextExtentsUtf8(win->env.dpy, f, (XftChar8*)t, next - t, &ext);
 		tw += ext.xOff;
 		if (tw <= w) {
-			XftDrawStringUtf8(d, color, f, x, y, (XftChar8*)t, next - t);
+			XftColor _c = {.pixel = *color, .color = {*color >> 8 & 0xFF00, *color & 0xFF00, *color << 8 & 0xFF00, -1}};
+			XftDrawStringUtf8(d, &_c, f, x, y, (XftChar8*)t, next - t);
 			x += ext.xOff;
 		}
 		if (f != font)
@@ -442,14 +482,13 @@ void win_draw_bar(win_t *win)
 	e = &win->env;
 	y = win->h + font->ascent + V_TEXT_PAD;
 	w = win->w - 2*H_TEXT_PAD;
-	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis,
-	                  e->cmap);
+	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis, e->cmap);
 
-	XSetForeground(e->dpy, gc, win->bar_bg.pixel);
+	XSetForeground(e->dpy, gc, win->bar_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, win->h, win->w, win->bar.h);
 
-	XSetForeground(e->dpy, gc, win->win_bg.pixel);
-	XSetBackground(e->dpy, gc, win->bar_bg.pixel);
+	XSetForeground(e->dpy, gc, win->win_bg);
+	XSetBackground(e->dpy, gc, win->bar_bg);
 
 	if ((len = strlen(r->buf)) > 0) {
 		if ((tw = TEXTWIDTH(win, r->buf, len)) > w)
@@ -465,6 +504,9 @@ void win_draw_bar(win_t *win)
 	}
 	XftDrawDestroy(d);
 }
+#else
+void win_draw_bar(win_t *win){}
+#endif
 
 void win_draw(win_t *win)
 {

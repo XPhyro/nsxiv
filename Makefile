@@ -13,6 +13,7 @@ OPT_DEP_DEFAULT ?= 1
 HAVE_INOTIFY ?= $(OPT_DEP_DEFAULT)
 
 # optional dependencies, see README for more info
+HAVE_LIBXFT ?= $(OPT_DEP_DEFAULT)
 HAVE_LIBGIF ?= $(OPT_DEP_DEFAULT)
 HAVE_LIBEXIF ?= $(OPT_DEP_DEFAULT)
 HAVE_LIBWEBP ?= $(OPT_DEP_DEFAULT)
@@ -25,9 +26,11 @@ ICONS = 16x16.png 32x32.png 48x48.png 64x64.png 128x128.png
 
 CPPFLAGS = -D_XOPEN_SOURCE=700 \
   -DHAVE_LIBGIF=$(HAVE_LIBGIF) -DHAVE_LIBEXIF=$(HAVE_LIBEXIF) \
-  -DHAVE_LIBWEBP=$(HAVE_LIBWEBP) \
+  -DHAVE_LIBWEBP=$(HAVE_LIBWEBP) -DHAVE_LIBXFT=$(HAVE_LIBXFT) \
   -I/usr/include/freetype2 -I$(PREFIX)/include/freetype2
 
+lib_xft_0 =
+lib_xft_1 = -lXft -lfontconfig
 lib_exif_0 =
 lib_exif_1 = -lexif
 lib_gif_0 =
@@ -37,9 +40,9 @@ lib_webp_1 = -lwebpdemux -lwebp
 autoreload_0 = nop
 autoreload_1 = inotify
 # using += because certain *BSD distros may need to add additional flags
-LDLIBS += -lImlib2 -lX11 -lXft -lfontconfig \
+LDLIBS += -lImlib2 -lX11 \
   $(lib_exif_$(HAVE_LIBEXIF)) $(lib_gif_$(HAVE_LIBGIF)) \
-  $(lib_webp_$(HAVE_LIBWEBP))
+  $(lib_webp_$(HAVE_LIBWEBP)) $(lib_xft_$(HAVE_LIBXFT))
 
 OBJS = autoreload_$(autoreload_$(HAVE_INOTIFY)).o commands.o image.o main.o options.o \
   thumbs.o util.o window.o

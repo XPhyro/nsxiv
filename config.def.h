@@ -4,9 +4,12 @@
 static const int WIN_WIDTH  = 800;
 static const int WIN_HEIGHT = 600;
 
-/* colors and font are configured via X resource properties.
+/* colors and font can be configured via X resource properties.
  * See nsxiv(1), X(7) section Resources and xrdb(1) for more information.
  */
+int DEFAULT_WIN_BG = 0xFFFFFF;
+int DEFAULT_WIN_FG = 0x000000;
+int DEFAULT_MARK_FG = 0x000000;
 
 #endif
 #ifdef _TITLE_CONFIG

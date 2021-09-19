@@ -382,9 +382,6 @@ int r_mkdir(char*);
 
 /* window.c */
 
-#include <X11/Xutil.h>
-#include <X11/Xft/Xft.h>
-
 enum {
 	BAR_L_LEN = 512,
 	BAR_R_LEN = 64
@@ -420,11 +417,13 @@ struct win {
 	Window xwin;
 	win_env_t env;
 
-	XftColor win_bg;
-	XftColor win_fg;
-	XftColor bar_bg;
-	XftColor bar_fg;
-	XftColor mrk_fg;
+	unsigned long win_bg;
+	unsigned long win_fg;
+#if HAVE_LIBXFT
+	unsigned long bar_bg;
+	unsigned long bar_fg;
+#endif
+	unsigned long mrk_fg;
 
 	int x;
 	int y;
