@@ -588,7 +588,7 @@ void on_keypress(XKeyEvent *kev)
 	if (IsModifierKey(ksym))
 		return;
 	if (extprefix && ksym == XK_Escape && MODMASK(kev->state) == 0) {
-		extprefix = False;
+		extprefix = false;
 	} else if (extprefix) {
 		run_key_handler(XKeysymToString(ksym), kev->state & ~sh);
 		extprefix = False;
