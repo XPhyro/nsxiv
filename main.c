@@ -690,6 +690,7 @@ void run(void)
 	const struct timespec ten_ms = {0, 10000000};
 	bool discard, init_thumb, load_thumb, to_set;
 	XEvent ev, nextev;
+	const struct timespec ten_ms = {0, 10000000};
 
 	while (true) {
 		to_set = check_timeouts(&timeout);
