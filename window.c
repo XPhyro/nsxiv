@@ -110,8 +110,8 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
 	win_bg = win_res(db, RES_CLASS ".window.background", NULL);
 	win_fg = win_res(db, RES_CLASS ".window.foreground", NULL);
-	bar_bg = win_res(db, RES_CLASS ".bar.background", win_fg);
-	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_bg);
+	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
+	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
 	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", win_fg);
 
 	win_alloc_color(e, win_bg, &win->win_bg);
