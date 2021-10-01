@@ -183,8 +183,8 @@ void win_init(win_t *win)
 	db = res_man != NULL ? XrmGetStringDatabase(res_man) : None;
 
 #if HAVE_LIBXFT
-	win->bar_bg = DEFAULT_WIN_FG;
-	win->bar_fg = DEFAULT_WIN_BG;
+	win->bar_bg = DEFAULT_WIN_BG;
+	win->bar_fg = DEFAULT_WIN_FG;
 	xft_init(e, win, db);
 #else
 	set_from_hex_string_if_present(db, RES_CLASS ".window.background", &win->win_bg);
