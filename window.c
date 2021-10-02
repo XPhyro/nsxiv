@@ -58,8 +58,7 @@ const char* win_res(XrmDatabase db, const char *name, const char *def)
 	XrmValue ret;
 
 	if (db != None &&
-		XrmGetResource(db, name, name, &type, &ret) &&
-		STREQ(type, "String"))
+		XrmGetResource(db, name, name, &type, &ret))
 	{
 		return ret.addr;
 	} else {
