@@ -32,6 +32,11 @@
 
 #define RES_CLASS "Nsxiv"
 
+#define INIT_ATOM_(atom) \
+	atoms[ATOM_##atom] = XInternAtom(e->dpy, #atom, False);
+#define TEXTWIDTH(win, text, len) \
+	win_draw_text(win, NULL, NULL, 0, 0, text, len, 0)
+
 enum {
 	H_TEXT_PAD = 5,
 	V_TEXT_PAD = 1
@@ -84,9 +89,6 @@ const char* win_res(XrmDatabase db, const char *name, const char *def)
 		return def;
 	}
 }
-
-#define INIT_ATOM_(atom) \
-	atoms[ATOM_##atom] = XInternAtom(e->dpy, #atom, False);
 
 void win_init(win_t *win)
 {
@@ -380,9 +382,6 @@ void win_clear(win_t *win)
 	XSetForeground(e->dpy, gc, win->win_bg.pixel);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 }
-
-#define TEXTWIDTH(win, text, len) \
-	win_draw_text(win, NULL, NULL, 0, 0, text, len, 0)
 
 int win_draw_text(win_t *win, XftDraw *d, const XftColor *color, int x, int y,
                   char *text, int len, int w)
