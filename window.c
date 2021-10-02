@@ -178,7 +178,7 @@ void win_open(win_t *win)
 	XSizeHints sizehints;
 	XWMHints hints;
 	pid_t pid;
-	char hostname[255];
+	char hostname[256];
 
 	e = &win->env;
 	parent = options->embed != 0 ? options->embed : RootWindow(e->dpy, e->scr);
@@ -231,10 +231,10 @@ void win_open(win_t *win)
 	XChangeProperty(e->dpy, win->xwin,
 	                atoms[ATOM__NET_WM_PID], XA_CARDINAL, sizeof(pid_t) * 8,
 	                PropModeReplace, (unsigned char *) &pid, 1);
-	if (gethostname(hostname, sizeof(hostname)) == 0) {
+	if (gethostname(hostname, ARRLEN(hostname)) == 0) {
 		XTextProperty tp;
 		tp.value = (unsigned char *)hostname;
-		tp.nitems = strnlen(hostname, sizeof(hostname));
+		tp.nitems = strnlen(hostname, ARRLEN(hostname));
 		tp.encoding = XA_STRING;
 		tp.format = 8;
 		XSetWMClientMachine(e->dpy, win->xwin, &tp);
