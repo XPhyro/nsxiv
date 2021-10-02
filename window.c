@@ -131,9 +131,16 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 }
 #else
 void set_from_hex_string_if_present(XrmDatabase db, const char *name, unsigned long *dest) {
-	const char* hex = win_res(db, RES_CLASS ".window.background", NULL);
+	const char* hex = win_res(db, name, NULL);
     if (hex && hex[0] == '#') {
-        *dest = strtol(hex+1, NULL, 16);
+		if (strlen(hex + 1) == 3) {
+			int temp = strtol(hex + 1, NULL, 16);
+			*dest = ((temp & 0xF00) << 12) | ((temp & 0xF00) << 8) |
+				((temp & 0xF0) << 8) | ((temp & 0xF0) << 4) |
+				((temp & 0xF) << 4) | (temp & 0xF);
+        } else {
+            *dest = strtol(hex + 1, NULL, 16);
+        }
     }
 }
 #endif
