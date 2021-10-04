@@ -45,12 +45,11 @@ nsxiv requires the following software to be installed:
 
   * Imlib2
   * X11
-  * Xft
-  * freetype2
-  * fontconfig
 
 The following dependencies are optional.
 
+  * libXft, freetype2, fontconfig : Used for the status bar.
+    Disabled via `HAVE_LIBXFT=0`
   * inotify : Used for auto-reloading images on change.
     Disabled via `HAVE_INOTIFY=0`
   * giflib : Used for animated gif playback.
