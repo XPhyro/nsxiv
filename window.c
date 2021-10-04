@@ -58,6 +58,26 @@ static int barheight;
 
 Atom atoms[ATOM_COUNT];
 
+#if HAVE_LIBXFT
+void win_init_font(const win_env_t *e, const char *fontstr)
+{
+	static int fontheight;
+	if ((font = XftFontOpenName(e->dpy, e->scr, fontstr)) == NULL)
+		error(EXIT_FAILURE, 0, "Error loading font '%s'", fontstr);
+	fontheight = font->ascent + font->descent;
+	FcPatternGetDouble(font->pattern, FC_SIZE, 0, &fontsize);
+	barheight = fontheight + 2 * V_TEXT_PAD;
+	XftFontClose(e->dpy, font);
+}
+#endif  /* HAVE_LIBXFT */
+
+void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
+{
+	XColor screen, exact;
+	if (!XAllocNamedColor(e->dpy, e->cmap, name, &screen, &exact))
+		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
+	*pixel = exact.pixel;
+}
 
 const char* win_res(XrmDatabase db, const char *name, const char *def)
 {
@@ -74,59 +94,22 @@ const char* win_res(XrmDatabase db, const char *name, const char *def)
 	}
 }
 
-void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
-{
-	XColor screen, exact;
-	if (!XAllocNamedColor(e->dpy, e->cmap, name, &screen, &exact))
-		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
-	*pixel = exact.pixel;
-}
-
-#if HAVE_LIBXFT
-void win_init_font(const win_env_t *e, const char *fontstr)
-{
-	static int fontheight;
-	if ((font = XftFontOpenName(e->dpy, e->scr, fontstr)) == NULL)
-		error(EXIT_FAILURE, 0, "Error loading font '%s'", fontstr);
-	fontheight = font->ascent + font->descent;
-	FcPatternGetDouble(font->pattern, FC_SIZE, 0, &fontsize);
-	barheight = fontheight + 2 * V_TEXT_PAD;
-	XftFontClose(e->dpy, font);
-}
-
-void xft_init(win_env_t *e, win_t *win, XrmDatabase db)
-{
-	const char *f;
-
-	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
-	win_init_font(e, f);
-
-	win->bar.l.size = BAR_L_LEN;
-	win->bar.r.size = BAR_R_LEN;
-	/* 3 padding bytes needed by utf8_decode */
-	win->bar.l.buf = emalloc(win->bar.l.size + 3);
-	win->bar.l.buf[0] = '\0';
-	win->bar.r.buf = emalloc(win->bar.r.size + 3);
-	win->bar.r.buf[0] = '\0';
-	win->bar.h = options->hide_bar ? 0 : barheight;
-
-}
-#endif  /* HAVE_LIBXFT */
-
 #define INIT_ATOM_(atom) \
 	atoms[ATOM_##atom] = XInternAtom(e->dpy, #atom, False);
+
 void win_init(win_t *win)
 {
 	win_env_t *e;
-	XVisualInfo vis;
-	XWindowAttributes attr;
-	Window parent;
-	XrmDatabase db;
-	char *res_man;
 	const char *win_bg, *win_fg, *mrk_fg;
 #if HAVE_LIBXFT
 	const char *bar_fg, *bar_bg;
+	const char *f;
 #endif
+	char *res_man;
+	XrmDatabase db;
+	XVisualInfo vis;
+	XWindowAttributes attr;
+	Window parent;
 
 	memset(win, 0, sizeof(win_t));
 
@@ -170,7 +153,17 @@ void win_init(win_t *win)
 	win_alloc_color(e, bar_bg, &win->bar_bg);
 	win_alloc_color(e, bar_fg, &win->bar_fg);
 
-	xft_init(e, win, db);
+	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
+	win_init_font(e, f);
+
+	win->bar.l.size = BAR_L_LEN;
+	win->bar.r.size = BAR_R_LEN;
+	/* 3 padding bytes needed by utf8_decode */
+	win->bar.l.buf = emalloc(win->bar.l.size + 3);
+	win->bar.l.buf[0] = '\0';
+	win->bar.r.buf = emalloc(win->bar.r.size + 3);
+	win->bar.r.buf[0] = '\0';
+	win->bar.h = options->hide_bar ? 0 : barheight;
 #endif
 
 	INIT_ATOM_(WM_DELETE_WINDOW);
