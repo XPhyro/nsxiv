@@ -130,14 +130,13 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
 }
 #else
-bool set_from_hex_string_if_present(win_env_t *e, win_t *win, XrmDatabase db,
+void set_from_hex_string_if_present(win_env_t *e, win_t *win, XrmDatabase db,
                                     const char *name, unsigned long *dest) {
 	XColor screen, exact;
 	const char *hex = win_res(db, name, NULL);
 	if (!XAllocNamedColor(e->dpy, e->cmap, hex, &screen, &exact))
-		return false;
+		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
 	*dest = exact.pixel;
-	return true;
 }
 #endif
 
