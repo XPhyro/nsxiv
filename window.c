@@ -130,18 +130,14 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
 }
 #else
-void set_from_hex_string_if_present(XrmDatabase db, const char *name, unsigned long *dest) {
-	const char* hex = win_res(db, name, NULL);
-    if (hex && hex[0] == '#') {
-		if (strlen(hex + 1) == 3) {
-			int temp = strtol(hex + 1, NULL, 16);
-			*dest = ((temp & 0xF00) << 12) | ((temp & 0xF00) << 8) |
-				((temp & 0xF0) << 8) | ((temp & 0xF0) << 4) |
-				((temp & 0xF) << 4) | (temp & 0xF);
-        } else {
-            *dest = strtol(hex + 1, NULL, 16);
-        }
-    }
+bool set_from_hex_string_if_present(win_env_t *e, win_t *win, XrmDatabase db,
+                                    const char *name, unsigned long *dest) {
+	XColor screen, exact;
+	const char *hex = win_res(db, name, NULL);
+	if (!XAllocNamedColor(e->dpy, e->cmap, hex, &screen, &exact))
+		return false;
+	*dest = exact.pixel;
+	return true;
 }
 #endif
 
@@ -193,9 +189,9 @@ void win_init(win_t *win)
 	win->bar_fg = DEFAULT_WIN_FG;
 	xft_init(e, win, db);
 #else
-	set_from_hex_string_if_present(db, RES_CLASS ".window.background", &win->win_bg);
-	set_from_hex_string_if_present(db, RES_CLASS ".window.foreground", &win->win_fg);
-	set_from_hex_string_if_present(db, RES_CLASS ".mark.foreground", &win->mrk_fg);
+	set_from_hex_string_if_present(e, win, db, RES_CLASS ".window.background", &win->win_bg);
+	set_from_hex_string_if_present(e, win, db, RES_CLASS ".window.foreground", &win->win_fg);
+	set_from_hex_string_if_present(e, win, db, RES_CLASS ".mark.foreground", &win->mrk_fg);
 #endif
 
 
