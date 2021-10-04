@@ -65,8 +65,8 @@ const char* win_res(XrmDatabase db, const char *name, const char *def)
 	XrmValue ret;
 
 	if (db != None &&
-	    XrmGetResource(db, name, name, &type, &ret) /* &&
-	    STREQ(type, "String") */)
+	    XrmGetResource(db, name, name, &type, &ret) &&
+	    STREQ(type, "String"))
 	{
 		return ret.addr;
 	} else {
@@ -98,11 +98,6 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
 	const char *f;
 
-	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
-		error(0, 0, "No locale support");
-
-	XrmInitialize();
-
 	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
 	win_init_font(e, f);
 
@@ -132,6 +127,11 @@ void win_init(win_t *win)
 #if HAVE_LIBXFT
 	const char *bar_fg, *bar_bg;
 #endif
+
+	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
+		error(0, 0, "No locale support");
+
+	XrmInitialize();
 
 	memset(win, 0, sizeof(win_t));
 
