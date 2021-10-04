@@ -424,11 +424,11 @@ struct win {
 
 	unsigned long win_bg;
 	unsigned long win_fg;
-#if HAVE_LIBXFT
-	unsigned long bar_bg;
-	unsigned long bar_fg;
-#endif
 	unsigned long mrk_fg;
+#if HAVE_LIBXFT
+	XftColor bar_bg;
+	XftColor bar_fg;
+#endif
 
 	int x;
 	int y;

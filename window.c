@@ -67,6 +67,12 @@ void win_init_font(const win_env_t *e, const char *fontstr)
 	barheight = fontheight + 2 * V_TEXT_PAD;
 	XftFontClose(e->dpy, font);
 }
+
+void xft_alloc_color(const win_env_t *e, const char *name, XftColor *col)
+{
+	if (!XftColorAllocName(e->dpy, e->vis, e->cmap, name, col))
+		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
+}
 #endif /* HAVE_LIBXFT */
 
 void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
@@ -148,8 +154,8 @@ void win_init(win_t *win)
 #if HAVE_LIBXFT
 	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
 	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
-	win_alloc_color(e, bar_bg, &win->bar_bg);
-	win_alloc_color(e, bar_fg, &win->bar_fg);
+	xft_alloc_color(e, bar_bg, &win->bar_bg);
+	xft_alloc_color(e, bar_fg, &win->bar_fg);
 
 	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
 	win_init_font(e, f);
@@ -406,7 +412,7 @@ void win_clear(win_t *win)
 #define TEXTWIDTH(win, text, len) \
 	win_draw_text(win, NULL, NULL, 0, 0, text, len, 0)
 
-int win_draw_text(win_t *win, XftDraw *d, const unsigned long *color, int x, int y,
+int win_draw_text(win_t *win, XftDraw *d, const XftColor *color, int x, int y,
                   char *text, int len, int w)
 {
 	int err, tw = 0;
@@ -431,14 +437,7 @@ int win_draw_text(win_t *win, XftDraw *d, const unsigned long *color, int x, int
 		XftTextExtentsUtf8(win->env.dpy, f, (XftChar8*)t, next - t, &ext);
 		tw += ext.xOff;
 		if (tw <= w) {
-			XftColor c;
-			enum { bitmask = 0x00FF00 };
-			c.pixel = *color;
-			c.color.red = *color >> 8 & bitmask;
-			c.color.green = *color >> 0 & bitmask;
-			c.color.blue = *color << 8 & bitmask;
-			c.color.alpha = -1;
-			XftDrawStringUtf8(d, &c, f, x, y, (XftChar8*)t, next - t);
+			XftDrawStringUtf8(d, color, f, x, y, (XftChar8*)t, next - t);
 			x += ext.xOff;
 		}
 		if (f != font)
@@ -463,11 +462,11 @@ void win_draw_bar(win_t *win)
 	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis,
 	                  e->cmap);
 
-	XSetForeground(e->dpy, gc, win->bar_bg);
+	XSetForeground(e->dpy, gc, win->bar_bg.pixel);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, win->h, win->w, win->bar.h);
 
 	XSetForeground(e->dpy, gc, win->win_bg);
-	XSetBackground(e->dpy, gc, win->bar_bg);
+	XSetBackground(e->dpy, gc, win->bar_bg.pixel);
 
 	if ((len = strlen(r->buf)) > 0) {
 		if ((tw = TEXTWIDTH(win, r->buf, len)) > w)
