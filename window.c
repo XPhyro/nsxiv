@@ -432,8 +432,14 @@ int win_draw_text(win_t *win, XftDraw *d, const unsigned long *color, int x, int
 		XftTextExtentsUtf8(win->env.dpy, f, (XftChar8*)t, next - t, &ext);
 		tw += ext.xOff;
 		if (tw <= w) {
-			XftColor _c = {.pixel = *color, .color = {*color >> 8 & 0xFF00, *color & 0xFF00, *color << 8 & 0xFF00, -1}};
-			XftDrawStringUtf8(d, &_c, f, x, y, (XftChar8*)t, next - t);
+			XftColor c;
+			enum { bitmask = 0x00FF00 };
+			c.pixel = *color;
+			c.color.red = *color >> 8 & bitmask;
+			c.color.green = *color >> 0 & bitmask;
+			c.color.blue = *color << 8 & bitmask;
+			c.color.alpha = -1;
+			XftDrawStringUtf8(d, &c, f, x, y, (XftChar8*)t, next - t);
 			x += ext.xOff;
 		}
 		if (f != font)
