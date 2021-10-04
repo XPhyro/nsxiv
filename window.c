@@ -94,8 +94,8 @@ void win_init_font(const win_env_t *e, const char *fontstr)
 	XftFontClose(e->dpy, font);
 }
 
-void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
-
+void xft_init(win_env_t *e, win_t *win, XrmDatabase db)
+{
 	const char *f;
 
 	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
@@ -128,11 +128,6 @@ void win_init(win_t *win)
 	const char *bar_fg, *bar_bg;
 #endif
 
-	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
-		error(0, 0, "No locale support");
-
-	XrmInitialize();
-
 	memset(win, 0, sizeof(win_t));
 
 	e = &win->env;
@@ -152,11 +147,14 @@ void win_init(win_t *win)
 		e->depth = attr.depth;
 	}
 
-
 	XMatchVisualInfo(e->dpy, e->scr, e->depth, TrueColor, &vis);
 	e->vis = vis.visual;
 	e->cmap = XCreateColormap(e->dpy, parent, e->vis, None);
 
+	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
+		error(0, 0, "No locale support");
+
+	XrmInitialize();
 	res_man = XResourceManagerString(e->dpy);
 	db = res_man != NULL ? XrmGetStringDatabase(res_man) : None;
 
