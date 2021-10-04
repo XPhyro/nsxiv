@@ -61,7 +61,7 @@ Atom atoms[ATOM_COUNT];
 #if HAVE_LIBXFT
 void win_init_font(const win_env_t *e, const char *fontstr)
 {
-	static int fontheight;
+	int fontheight = 0;
 	if ((font = XftFontOpenName(e->dpy, e->scr, fontstr)) == NULL)
 		error(EXIT_FAILURE, 0, "Error loading font '%s'", fontstr);
 	fontheight = font->ascent + font->descent;
