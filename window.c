@@ -69,7 +69,7 @@ void win_init_font(const win_env_t *e, const char *fontstr)
 	barheight = fontheight + 2 * V_TEXT_PAD;
 	XftFontClose(e->dpy, font);
 }
-#endif  /* HAVE_LIBXFT */
+#endif /* HAVE_LIBXFT */
 
 void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
 {
@@ -102,8 +102,7 @@ void win_init(win_t *win)
 	win_env_t *e;
 	const char *win_bg, *win_fg, *mrk_fg;
 #if HAVE_LIBXFT
-	const char *bar_fg, *bar_bg;
-	const char *f;
+	const char *bar_fg, *bar_bg, *f;
 #endif
 	char *res_man;
 	XrmDatabase db;
@@ -147,6 +146,7 @@ void win_init(win_t *win)
 	win_alloc_color(e, win_bg, &win->win_bg);
 	win_alloc_color(e, win_fg, &win->win_fg);
 	win_alloc_color(e, mrk_fg, &win->mrk_fg);
+
 #if HAVE_LIBXFT
 	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
 	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
@@ -164,7 +164,7 @@ void win_init(win_t *win)
 	win->bar.r.buf = emalloc(win->bar.r.size + 3);
 	win->bar.r.buf[0] = '\0';
 	win->bar.h = options->hide_bar ? 0 : barheight;
-#endif
+#endif /* HAVE_LIBXFT */
 
 	INIT_ATOM_(WM_DELETE_WINDOW);
 	INIT_ATOM_(_NET_WM_NAME);
@@ -318,7 +318,6 @@ void win_open(win_t *win)
 	win->buf.h = e->scrh;
 	win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
 	                            win->buf.w, win->buf.h, e->depth);
-
 	XSetForeground(e->dpy, gc, win->win_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 	XSetWindowBackgroundPixmap(e->dpy, win->xwin, win->buf.pm);
