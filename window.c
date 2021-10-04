@@ -66,6 +66,14 @@ const char* win_res(XrmDatabase db, const char *name, const char *def)
 	}
 }
 
+void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
+{
+	XColor screen, exact;
+	if (!XAllocNamedColor(e->dpy, e->cmap, name, &screen, &exact))
+		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
+	*pixel = exact.pixel;
+}
+
 #if HAVE_LIBXFT
 #include <X11/Xft/Xft.h>
 #include "utf8.h"
@@ -82,22 +90,9 @@ void win_init_font(const win_env_t *e, const char *fontstr)
 	XftFontClose(e->dpy, font);
 }
 
-void win_alloc_color(const win_env_t *e, const char *name, unsigned long* pixel)
-{
-	XftColor col;
-	if(!name)
-		return;
-	if (!XftColorAllocName(e->dpy, e->vis, e->cmap, name, &col))
-	{
-		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
-	}
-	*pixel =  col.pixel;
-	XftColorFree(e->dpy, e->vis, e->cmap, &col);
-}
-
 void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
-	const char *win_bg, *win_fg, *bar_bg, *bar_fg, *mrk_fg, *f;
+	const char *f;
 
 	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
 		error(0, 0, "No locale support");
@@ -106,18 +101,6 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 
 	f = win_res(db, RES_CLASS ".bar.font", "monospace-8");
 	win_init_font(e, f);
-
-	win_bg = win_res(db, RES_CLASS ".window.background", NULL);
-	win_fg = win_res(db, RES_CLASS ".window.foreground", NULL);
-	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
-	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
-	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", win_fg);
-
-	win_alloc_color(e, win_bg, &win->win_bg);
-	win_alloc_color(e, win_fg, &win->win_fg);
-	win_alloc_color(e, bar_bg, &win->bar_bg);
-	win_alloc_color(e, bar_fg, &win->bar_fg);
-	win_alloc_color(e, mrk_fg, &win->mrk_fg);
 
 	win->bar.l.size = BAR_L_LEN;
 	win->bar.r.size = BAR_R_LEN;
@@ -128,15 +111,6 @@ void xft_init(win_env_t *e, win_t *win, XrmDatabase db) {
 	win->bar.r.buf[0] = '\0';
 	win->bar.h = options->hide_bar ? 0 : barheight;
 
-}
-#else
-void set_from_hex_string_if_present(win_env_t *e, win_t *win, XrmDatabase db,
-                                    const char *name, unsigned long *dest) {
-	XColor screen, exact;
-	const char *hex = win_res(db, name, NULL);
-	if (!XAllocNamedColor(e->dpy, e->cmap, hex, &screen, &exact))
-		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
-	*dest = exact.pixel;
 }
 #endif
 
@@ -151,6 +125,10 @@ void win_init(win_t *win)
 	Window parent;
 	XrmDatabase db;
 	char *res_man;
+	const char *win_bg, *win_fg, *mrk_fg;
+#if HAVE_LIBXFT
+	const char *bar_fg, *bar_bg;
+#endif
 
 	memset(win, 0, sizeof(win_t));
 
@@ -176,23 +154,23 @@ void win_init(win_t *win)
 	e->vis = vis.visual;
 	e->cmap = XCreateColormap(e->dpy, parent, e->vis, None);
 
-	win->win_bg = DEFAULT_WIN_BG;
-	win->win_fg = DEFAULT_WIN_FG;
-	win->mrk_fg = DEFAULT_MARK_FG;
-
 	res_man = XResourceManagerString(e->dpy);
 	db = res_man != NULL ? XrmGetStringDatabase(res_man) : None;
 
+	win_bg = win_res(db, RES_CLASS ".window.background", "black");
+	win_fg = win_res(db, RES_CLASS ".window.foreground", "white");
+	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", win_fg);
+	win_alloc_color(e, win_bg, &win->win_bg);
+	win_alloc_color(e, win_fg, &win->win_fg);
+	win_alloc_color(e, mrk_fg, &win->mrk_fg);
 #if HAVE_LIBXFT
-	win->bar_bg = DEFAULT_WIN_BG;
-	win->bar_fg = DEFAULT_WIN_FG;
-	xft_init(e, win, db);
-#else
-	set_from_hex_string_if_present(e, win, db, RES_CLASS ".window.background", &win->win_bg);
-	set_from_hex_string_if_present(e, win, db, RES_CLASS ".window.foreground", &win->win_fg);
-	set_from_hex_string_if_present(e, win, db, RES_CLASS ".mark.foreground", &win->mrk_fg);
-#endif
+	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
+	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
+	win_alloc_color(e, bar_bg, &win->bar_bg);
+	win_alloc_color(e, bar_fg, &win->bar_fg);
 
+	xft_init(e, win, db);
+#endif
 
 	INIT_ATOM_(WM_DELETE_WINDOW);
 	INIT_ATOM_(_NET_WM_NAME);
