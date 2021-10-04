@@ -484,7 +484,7 @@ void win_draw_bar(win_t *win)
 }
 #else
 void win_draw_bar(win_t *win){}
-#endif
+#endif /* HAVE_LIBXFT */
 
 void win_draw(win_t *win)
 {
