@@ -29,9 +29,9 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
 
 #define _MAPPINGS_CONFIG
 #include "config.h"

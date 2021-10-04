@@ -316,7 +316,8 @@ void win_open(win_t *win)
 
 	win->buf.w = e->scrw;
 	win->buf.h = e->scrh;
-	win->buf.pm = XCreatePixmap(e->dpy, win->xwin, win->buf.w, win->buf.h, e->depth);
+	win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
+	                            win->buf.w, win->buf.h, e->depth);
 
 	XSetForeground(e->dpy, gc, win->win_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
@@ -397,7 +398,8 @@ void win_clear(win_t *win)
 		XFreePixmap(e->dpy, win->buf.pm);
 		win->buf.w = MAX(win->buf.w, win->w);
 		win->buf.h = MAX(win->buf.h, win->h + win->bar.h);
-		win->buf.pm = XCreatePixmap(e->dpy, win->xwin, win->buf.w, win->buf.h, e->depth);
+		win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
+		                            win->buf.w, win->buf.h, e->depth);
 	}
 	XSetForeground(e->dpy, gc, win->win_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
@@ -461,7 +463,8 @@ void win_draw_bar(win_t *win)
 	e = &win->env;
 	y = win->h + font->ascent + V_TEXT_PAD;
 	w = win->w - 2*H_TEXT_PAD;
-	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis, e->cmap);
+	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis,
+	                  e->cmap);
 
 	XSetForeground(e->dpy, gc, win->bar_bg);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, win->h, win->w, win->bar.h);
