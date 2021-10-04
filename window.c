@@ -28,10 +28,8 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 #include <X11/Xresource.h>
-#include <X11/Xutil.h>
 
 #if HAVE_LIBXFT
-#include <X11/Xft/Xft.h>
 #include "utf8.h"
 static XftFont *font;
 static double fontsize;

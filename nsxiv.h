@@ -382,6 +382,11 @@ int r_mkdir(char*);
 
 /* window.c */
 
+#include <X11/Xutil.h>
+#if HAVE_LIBXFT
+#include <X11/Xft/Xft.h>
+#endif
+
 enum {
 	BAR_L_LEN = 512,
 	BAR_R_LEN = 64

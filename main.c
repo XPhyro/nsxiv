@@ -17,6 +17,8 @@
  */
 
 #include "nsxiv.h"
+#define _MAPPINGS_CONFIG
+#include "config.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,10 +33,6 @@
 #include <time.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
-#include <X11/Xutil.h>
-
-#define _MAPPINGS_CONFIG
-#include "config.h"
 
 typedef struct {
 	struct timeval when;
