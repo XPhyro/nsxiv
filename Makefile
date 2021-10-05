@@ -24,10 +24,13 @@ CFLAGS ?= -std=c99 -Wall -pedantic
 # icons that will be installed via `make icon`
 ICONS = 16x16.png 32x32.png 48x48.png 64x64.png 128x128.png
 
+inc_xft_0 =
+inc_xft_1 = -I/usr/include/freetype2 -I$(PREFIX)/include/freetype2
+
 CPPFLAGS = -D_XOPEN_SOURCE=700 \
   -DHAVE_LIBGIF=$(HAVE_LIBGIF) -DHAVE_LIBEXIF=$(HAVE_LIBEXIF) \
   -DHAVE_LIBWEBP=$(HAVE_LIBWEBP) -DHAVE_LIBXFT=$(HAVE_LIBXFT) \
-  -I/usr/include/freetype2 -I$(PREFIX)/include/freetype2
+  $(inc_xft_$(HAVE_LIBXFT))
 
 lib_xft_0 =
 lib_xft_1 = -lXft -lfontconfig
