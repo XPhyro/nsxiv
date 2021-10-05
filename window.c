@@ -106,14 +106,14 @@ static const char* win_res(XrmDatabase db, const char *name, const char *def)
 void win_init(win_t *win)
 {
 	win_env_t *e;
-	const char *win_bg, *win_fg, *mrk_fg;
-	char *res_man;
-	XrmDatabase db;
+	const char *win_bg, *win_fg, *mrk_fg, *win_alpha;
 #if HAVE_LIBFONTS
 	const char *bar_fg, *bar_bg, *f;
-
-	static char lbuf[512 + 3], rbuf[64 + 3];
 #endif
+	char *res_man;
+	XrmDatabase db;
+	XVisualInfo vis;
+	float alpha;
 
 	memset(win, 0, sizeof(win_t));
 
@@ -124,9 +124,17 @@ void win_init(win_t *win)
 	e->scr = DefaultScreen(e->dpy);
 	e->scrw = DisplayWidth(e->dpy, e->scr);
 	e->scrh = DisplayHeight(e->dpy, e->scr);
-	e->depth = DefaultDepth(e->dpy, e->scr);
-	e->vis = DefaultVisual(e->dpy, e->scr);
-	e->cmap = DefaultColormap(e->dpy, e->scr);
+
+	if (XMatchVisualInfo(e->dpy, e->scr, 32, TrueColor, &vis)) {
+		e->depth = 32;
+		e->vis = vis.visual;
+		e->cmap = XCreateColormap(e->dpy, DefaultRootWindow(e->dpy), e->vis, None);
+	}
+	else {
+		e->depth = DefaultDepth(e->dpy, e->scr);
+		e->vis = DefaultVisual(e->dpy, e->scr);
+		e->cmap = DefaultColormap(e->dpy, e->scr);
+	}
 
 	if (setlocale(LC_CTYPE, "") == NULL || XSupportsLocale() == 0)
 		error(0, 0, "No locale support");
@@ -141,6 +149,23 @@ void win_init(win_t *win)
 	win_alloc_color(e, win_bg, &win->win_bg);
 	win_alloc_color(e, win_fg, &win->win_fg);
 	win_alloc_color(e, mrk_fg, &win->mrk_fg);
+
+	/* apply alpha */
+	win_alpha = win_res(db, RES_CLASS ".window.alpha", "1.0");
+	alpha = strtof(win_alpha, NULL);
+	win->win_alpha = 0xFF;
+	win->win_bg_premul = win->win_bg;
+	if (e->depth == 32 && alpha >= 0.0 && alpha < 1.0) {
+		win->win_alpha *= alpha;
+		win->win_bg_premul.red *= alpha;
+		win->win_bg_premul.green *= alpha;
+		win->win_bg_premul.blue *= alpha;
+		win->win_bg_premul.pixel =
+			(((unsigned long) win->win_bg_premul.blue  >> 8) <<  0) |
+			(((unsigned long) win->win_bg_premul.green >> 8) <<  8) |
+			(((unsigned long) win->win_bg_premul.red   >> 8) << 16) |
+			(((unsigned long) win->win_alpha               ) << 24);
+	}
 
 #if HAVE_LIBFONTS
 	bar_bg = win_res(db, RES_CLASS ".bar.background", DEFAULT_BAR_BG ? DEFAULT_BAR_BG : win_bg);
@@ -319,7 +344,7 @@ void win_open(win_t *win)
 	win->buf.h = e->scrh;
 	win->buf.pm = XCreatePixmap(e->dpy, win->xwin, win->buf.w, win->buf.h, e->depth);
 
-	XSetForeground(e->dpy, gc, win->win_bg.pixel);
+	XSetForeground(e->dpy, gc, win->win_bg_premul.pixel);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 	XSetWindowBackgroundPixmap(e->dpy, win->xwin, win->buf.pm);
 	XMapWindow(e->dpy, win->xwin);
@@ -399,7 +424,7 @@ void win_clear(win_t *win)
 		win->buf.pm = XCreatePixmap(e->dpy, win->xwin,
 		                            win->buf.w, win->buf.h, e->depth);
 	}
-	XSetForeground(e->dpy, gc, win->win_bg.pixel);
+	XSetForeground(e->dpy, gc, win->win_bg_premul.pixel);
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 }
 
