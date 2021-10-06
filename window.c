@@ -29,7 +29,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xresource.h>
 
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 #include "utf8.h"
 static XftFont *font;
 static double fontsize;
@@ -56,7 +56,7 @@ static int barheight;
 
 Atom atoms[ATOM_COUNT];
 
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 void win_init_font(const win_env_t *e, const char *fontstr)
 {
 	int fontheight = 0;
@@ -73,7 +73,7 @@ void xft_alloc_color(const win_env_t *e, const char *name, XftColor *col)
 	if (!XftColorAllocName(e->dpy, e->vis, e->cmap, name, col))
 		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
 }
-#endif /* HAVE_LIBXFT */
+#endif /* HAVE_LIBFONTS */
 
 void win_alloc_color(const win_env_t *e, const char *name, unsigned long *pixel)
 {
@@ -105,7 +105,7 @@ void win_init(win_t *win)
 {
 	win_env_t *e;
 	const char *win_bg, *win_fg, *mrk_fg;
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 	const char *bar_fg, *bar_bg, *f;
 #endif
 	char *res_man;
@@ -151,7 +151,7 @@ void win_init(win_t *win)
 	win_alloc_color(e, win_fg, &win->win_fg);
 	win_alloc_color(e, mrk_fg, &win->mrk_fg);
 
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 	bar_bg = win_res(db, RES_CLASS ".bar.background", win_bg);
 	bar_fg = win_res(db, RES_CLASS ".bar.foreground", win_fg);
 	xft_alloc_color(e, bar_bg, &win->bar_bg);
@@ -168,7 +168,7 @@ void win_init(win_t *win)
 	win->bar.r.buf = emalloc(win->bar.r.size + 3);
 	win->bar.r.buf[0] = '\0';
 	win->bar.h = options->hide_bar ? 0 : barheight;
-#endif /* HAVE_LIBXFT */
+#endif /* HAVE_LIBFONTS */
 
 	INIT_ATOM_(WM_DELETE_WINDOW);
 	INIT_ATOM_(_NET_WM_NAME);
@@ -408,7 +408,7 @@ void win_clear(win_t *win)
 	XFillRectangle(e->dpy, win->buf.pm, gc, 0, 0, win->buf.w, win->buf.h);
 }
 
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 #define TEXTWIDTH(win, text, len) \
 	win_draw_text(win, NULL, NULL, 0, 0, text, len, 0)
 
@@ -484,7 +484,7 @@ void win_draw_bar(win_t *win)
 }
 #else
 void win_draw_bar(win_t *win){}
-#endif /* HAVE_LIBXFT */
+#endif /* HAVE_LIBFONTS */
 
 void win_draw(win_t *win)
 {

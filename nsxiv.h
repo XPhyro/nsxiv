@@ -383,7 +383,7 @@ int r_mkdir(char*);
 /* window.c */
 
 #include <X11/Xutil.h>
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 #include <X11/Xft/Xft.h>
 #endif
 
@@ -425,7 +425,7 @@ struct win {
 	unsigned long win_bg;
 	unsigned long win_fg;
 	unsigned long mrk_fg;
-#if HAVE_LIBXFT
+#if HAVE_LIBFONTS
 	XftColor bar_bg;
 	XftColor bar_fg;
 #endif
