@@ -26,7 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 
-opt_t _options;
+static opt_t _options;
 const opt_t *options = (const opt_t*) &_options;
 
 void print_usage(void)
@@ -36,7 +36,7 @@ void print_usage(void)
 	       "[-z ZOOM] FILES...\n");
 }
 
-void print_version(void)
+static void print_version(void)
 {
 	puts("nsxiv " VERSION);
 }
