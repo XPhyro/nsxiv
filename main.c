@@ -67,7 +67,7 @@ int markidx;
 int prefix;
 bool extprefix;
 
-bool resized = false;
+static bool resized = false;
 
 typedef struct {
 	int err;
