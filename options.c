@@ -26,8 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static opt_t _options;
-const opt_t *options = (const opt_t*) &_options;
+const opt_t *options;
 
 void print_usage(void)
 {
@@ -46,6 +45,8 @@ void parse_options(int argc, char **argv)
 	int n, opt;
 	char *end, *s;
 	const char *scalemodes = "dfFwh";
+	static opt_t _options;
+	options = &_options;
 
 	progname = strrchr(argv[0], '/');
 	progname = progname ? progname + 1 : argv[0];
