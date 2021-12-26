@@ -148,7 +148,7 @@ static void img_multiframe_deprication_notice(void)
 	if (!warned) {
 		error(0, 0, "\n"
 		      "################################################################\n"
-		      "#                  DEPRICATION NOTICE                          #\n"
+		      "#                      DEPRICATION NOTICE                      #\n"
 		      "################################################################\n"
 		      "# Internal multi-frame gif and webp loaders are depricated and #\n"
 		      "# will be removed soon. Please upgrade to Imlib2 vX.X.X for    #\n"
