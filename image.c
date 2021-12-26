@@ -429,7 +429,6 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 	unsigned int fcnt;
 	Imlib_Image im;
 	Imlib_Frame_Info finfo;
-	int pw, ph, px, py; /* previous frame */
 	bool clear;
 
 	imlib_context_set_image(img->im);
@@ -458,10 +457,6 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		imlib_image_get_frame_info(&finfo);
 
 		if (clear) {
-			pw = finfo.frame_w;
-			ph = finfo.frame_h;
-			px = finfo.frame_x;
-			py = finfo.frame_y;
 			img->multi.frames[img->multi.cnt].im = im;
 		} else { /* blend on top of the previous image */
 			Imlib_Image tmp;
@@ -471,7 +466,8 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 			int sw = finfo.frame_w;
 			int sh = finfo.frame_h;
 
-			if ((tmp = imlib_create_image(pw, ph)) == NULL)
+			imlib_context_set_image(prev);
+			if ((tmp = imlib_clone_image()) == NULL)
 				error(EXIT_FAILURE, ENOMEM, NULL);
 			imlib_context_set_image(tmp);
 			imlib_context_set_blend(1);
@@ -479,8 +475,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 			imlib_image_set_has_alpha(0);
 			imlib_context_set_anti_alias(0);
 			imlib_context_set_color_modifier(NULL);
-			imlib_blend_image_onto_image(prev, 0, 0, 0, pw, ph, px, py, pw, ph);
-			imlib_blend_image_onto_image(im,   0, 0, 0, sw, sh, sx, sy, sw, sh);
+			imlib_blend_image_onto_image(im, 0, 0, 0, sw, sh, sx, sy, sw, sh);
 			img->multi.frames[img->multi.cnt].im = tmp;
 		}
 
