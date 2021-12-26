@@ -141,6 +141,26 @@ static void img_multiframe_context_set(img_t *img)
 }
 #endif
 
+#if (HAVE_LIBGIF || HAVE_LIBWEBP) && !IMLIB2_MULTI_FRAME
+static void img_multiframe_deprication_notice(void)
+{
+	static bool warned;
+	if (!warned) {
+		error(0, 0, "\n"
+		      "################################################################\n"
+		      "#                  DEPRICATION NOTICE                          #\n"
+		      "################################################################\n"
+		      "# Internal multi-frame gif and webp loaders are depricated and #\n"
+		      "# will be removed soon. Please upgrade to Imlib2 vX.X.X for    #\n"
+		      "# multi-frame/animated image support. For more information,    #\n"
+		      "# visit: https://github.com/nsxiv/nsxiv/issues/193             #\n"
+		      "################################################################"
+		      );
+		warned = true;
+	}
+}
+#endif
+
 #if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
 static bool img_load_gif(img_t *img, const fileinfo_t *file)
 {
@@ -160,6 +180,8 @@ static bool img_load_gif(img_t *img, const fileinfo_t *file)
 	unsigned int disposal = 0, prev_disposal = 0;
 	unsigned int delay = 0;
 	bool err = false;
+
+	img_multiframe_deprication_notice();
 
 	if (img->multi.cap == 0) {
 		img->multi.cap = 8;
@@ -310,7 +332,6 @@ static bool img_load_gif(img_t *img, const fileinfo_t *file)
 }
 #endif /* HAVE_LIBGIF */
 
-
 #if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
 static bool img_load_webp(img_t *img, const fileinfo_t *file)
 {
@@ -327,6 +348,8 @@ static bool img_load_webp(img_t *img, const fileinfo_t *file)
 	unsigned long flags;
 	unsigned int delay;
 	bool err = false;
+
+	img_multiframe_deprication_notice();
 
 	if ((webp_file = fopen(file->path, "rb")) == NULL) {
 		error(0, errno, "%s: Error opening webp image", file->name);
@@ -398,6 +421,7 @@ fail:
 #endif /* HAVE_LIBWEBP */
 
 #if IMLIB2_MULTI_FRAME
+/* FIXME: animated webp currently has weird artifacts */
 static bool
 img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
