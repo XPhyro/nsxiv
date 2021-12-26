@@ -32,12 +32,19 @@
 #include <libexif/exif-data.h>
 #endif
 
-#if HAVE_LIBGIF
+/* TODO: fix version on imlib2 release */
+#if defined(IMLIB2_VERSION) /* && (IMLIB2_VERSION >= IMLIB2_VERSION_(X, X, X)) */
+#define IMLIB2_MULTI_FRAME 1
+#else
+#define IMLIB2_MULTI_FRAME 0
+#endif
+
+#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
 #include <gif_lib.h>
 enum { DEF_GIF_DELAY = 75 };
 #endif
 
-#if HAVE_LIBWEBP
+#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
 #include <webp/decode.h>
 #include <webp/demux.h>
 enum { DEF_WEBP_DELAY = 75 };
@@ -117,7 +124,7 @@ void exif_auto_orientate(const fileinfo_t *file)
 }
 #endif
 
-#if HAVE_LIBGIF || HAVE_LIBWEBP
+#if HAVE_LIBGIF || HAVE_LIBWEBP || IMLIB2_MULTI_FRAME
 static void img_multiframe_context_set(img_t *img)
 {
 	if (img->multi.cnt > 1) {
@@ -134,7 +141,7 @@ static void img_multiframe_context_set(img_t *img)
 }
 #endif
 
-#if HAVE_LIBGIF
+#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
 static bool img_load_gif(img_t *img, const fileinfo_t *file)
 {
 	GifFileType *gif;
@@ -304,7 +311,7 @@ static bool img_load_gif(img_t *img, const fileinfo_t *file)
 #endif /* HAVE_LIBGIF */
 
 
-#if HAVE_LIBWEBP
+#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
 static bool img_load_webp(img_t *img, const fileinfo_t *file)
 {
 	FILE *webp_file;
@@ -390,6 +397,77 @@ fail:
 }
 #endif /* HAVE_LIBWEBP */
 
+#if IMLIB2_MULTI_FRAME
+static bool
+img_load_multiframe(img_t *img, const fileinfo_t *file)
+{
+	unsigned int n;
+	unsigned int fcnt;
+	Imlib_Image im;
+	Imlib_Frame_Info finfo;
+	int pw, ph, px, py; /* previous frame */
+
+	imlib_context_set_image(img->im);
+	imlib_image_get_frame_info(&finfo);
+	if ((fcnt = finfo.frame_count) <= 1) {
+		if (fcnt < 1)
+			error(0, 0, "%s: image has no frames (?)", file->name);
+		return false;
+	}
+
+	if (fcnt > img->multi.cap) {
+		img->multi.cap = fcnt;
+		img->multi.frames = erealloc(img->multi.frames,
+		                             img->multi.cap * sizeof(img_frame_t));
+	}
+
+	img->multi.cnt = img->multi.sel = 0;
+	for (n = 1; n <= fcnt; ++n) {
+		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
+			error(0, 0, "%s: error loading frame %d", file->name, n);
+			img_multiframe_context_set(img);
+			return false;
+		}
+		imlib_context_set_image(im);
+		imlib_image_get_frame_info(&finfo);
+
+		if (n == 1 || (finfo.frame_flags & IMLIB_FRAME_CLEAR)) {
+			pw = finfo.frame_w;
+			ph = finfo.frame_h;
+			px = finfo.frame_x;
+			py = finfo.frame_y;
+			img->multi.frames[img->multi.cnt].im = im;
+		} else { /* blend on top of the previous image */
+			Imlib_Image tmp;
+			Imlib_Image prev = img->multi.frames[img->multi.cnt - 1].im;
+			int sx = finfo.frame_x;
+			int sy = finfo.frame_y;
+			int sw = finfo.frame_w;
+			int sh = finfo.frame_h;
+
+			if ((tmp = imlib_create_image(pw, ph)) == NULL)
+				error(EXIT_FAILURE, ENOMEM, NULL);
+			imlib_context_set_image(tmp);
+			imlib_context_set_blend(1);
+			imlib_context_set_dither(0);
+			imlib_image_set_has_alpha(0);
+			imlib_context_set_anti_alias(0);
+			imlib_context_set_color_modifier(NULL);
+			imlib_blend_image_onto_image(prev, 0, 0, 0, pw, ph, px, py, pw, ph);
+			imlib_blend_image_onto_image(im,   0, 0, 0, sw, sh, sx, sy, sw, sh);
+			img->multi.frames[img->multi.cnt].im = tmp;
+		}
+
+		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
+		img->multi.length += img->multi.frames[img->multi.cnt].delay;
+		img->multi.cnt++;
+	}
+	img_multiframe_context_set(img);
+
+	return true;
+}
+#endif /* IMLIB2_MULTI_FRAME */
+
 Imlib_Image img_open(const fileinfo_t *file)
 {
 	struct stat st;
@@ -398,7 +476,11 @@ Imlib_Image img_open(const fileinfo_t *file)
 	if (access(file->path, R_OK) == 0 &&
 	    stat(file->path, &st) == 0 && S_ISREG(st.st_mode))
 	{
+#if IMLIB2_MULTI_FRAME
+		im = imlib_load_image_frame(file->path, 1);
+#else
 		im = imlib_load_image(file->path);
+#endif
 		if (im != NULL) {
 			imlib_context_set_image(im);
 			if (imlib_image_get_data_for_reading_only() == NULL) {
@@ -425,12 +507,16 @@ bool img_load(img_t *img, const fileinfo_t *file)
 	exif_auto_orientate(file);
 #endif
 
+#if IMLIB2_MULTI_FRAME
+	img_load_multiframe(img, file);
+#endif
+
 	if ((fmt = imlib_image_format()) != NULL) {
-#if HAVE_LIBGIF
+#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
 		if (STREQ(fmt, "gif"))
 			img_load_gif(img, file);
 #endif
-#if HAVE_LIBWEBP
+#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
 		if (STREQ(fmt, "webp"))
 			img_load_webp(img, file);
 #endif

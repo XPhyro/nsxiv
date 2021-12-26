@@ -30,7 +30,7 @@ inc_fonts_1 = -I/usr/include/freetype2 -I$(PREFIX)/include/freetype2
 CPPFLAGS = -D_XOPEN_SOURCE=700 \
   -DHAVE_LIBGIF=$(HAVE_LIBGIF) -DHAVE_LIBEXIF=$(HAVE_LIBEXIF) \
   -DHAVE_LIBWEBP=$(HAVE_LIBWEBP) -DHAVE_LIBFONTS=$(HAVE_LIBFONTS) \
-  $(inc_fonts_$(HAVE_LIBFONTS))
+  $(inc_fonts_$(HAVE_LIBFONTS)) -I/usr/local/include
 
 lib_fonts_0 =
 lib_fonts_1 = -lXft -lfontconfig
@@ -45,7 +45,8 @@ autoreload_1 = inotify
 # using += because certain *BSD distros may need to add additional flags
 LDLIBS += -lImlib2 -lX11 \
   $(lib_exif_$(HAVE_LIBEXIF)) $(lib_gif_$(HAVE_LIBGIF)) \
-  $(lib_webp_$(HAVE_LIBWEBP)) $(lib_fonts_$(HAVE_LIBFONTS))
+  $(lib_webp_$(HAVE_LIBWEBP)) $(lib_fonts_$(HAVE_LIBFONTS)) \
+  -L/usr/local/lib
 
 OBJS = autoreload_$(autoreload_$(HAVE_INOTIFY)).o commands.o image.o main.o options.o \
   thumbs.o util.o window.o
