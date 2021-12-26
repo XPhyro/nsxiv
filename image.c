@@ -430,6 +430,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 	Imlib_Image im;
 	Imlib_Frame_Info finfo;
 	int pw, ph, px, py; /* previous frame */
+	bool clear;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
@@ -445,6 +446,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		                             img->multi.cap * sizeof(img_frame_t));
 	}
 
+	clear = true;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
@@ -455,7 +457,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		imlib_context_set_image(im);
 		imlib_image_get_frame_info(&finfo);
 
-		if (n == 1 || (finfo.frame_flags & IMLIB_FRAME_CLEAR)) {
+		if (clear) {
 			pw = finfo.frame_w;
 			ph = finfo.frame_h;
 			px = finfo.frame_x;
@@ -482,6 +484,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 			img->multi.frames[img->multi.cnt].im = tmp;
 		}
 
+		clear = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
