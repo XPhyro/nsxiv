@@ -429,7 +429,8 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 	unsigned int fcnt;
 	Imlib_Image im;
 	Imlib_Frame_Info finfo;
-	bool clear;
+	bool dispose, has_alpha;
+	int px, py, pw, ph;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
@@ -438,6 +439,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 			error(0, 0, "%s: image has no frames (?)", file->name);
 		return false;
 	}
+	has_alpha = imlib_image_has_alpha();
 
 	if (fcnt > img->multi.cap) {
 		img->multi.cap = fcnt;
@@ -445,7 +447,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		                             img->multi.cap * sizeof(img_frame_t));
 	}
 
-	clear = true;
+	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
@@ -456,7 +458,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		imlib_context_set_image(im);
 		imlib_image_get_frame_info(&finfo);
 
-		if (clear) {
+		if (n == 1) {
 			img->multi.frames[img->multi.cnt].im = im;
 		} else { /* blend on top of the previous image */
 			Imlib_Image tmp;
@@ -470,16 +472,28 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 			if ((tmp = imlib_clone_image()) == NULL)
 				error(EXIT_FAILURE, ENOMEM, NULL);
 			imlib_context_set_image(tmp);
-			imlib_context_set_blend(1);
 			imlib_context_set_dither(0);
-			imlib_image_set_has_alpha(0);
+			imlib_image_set_has_alpha(has_alpha);
 			imlib_context_set_anti_alias(0);
 			imlib_context_set_color_modifier(NULL);
-			imlib_blend_image_onto_image(im, 0, 0, 0, sw, sh, sx, sy, sw, sh);
+
+			if (dispose) {
+				imlib_context_set_blend(0);
+				imlib_context_set_color(0, 0, 0, 0);
+				imlib_image_fill_rectangle(px, py, pw, ph);
+			}
+			imlib_context_set_blend(1);
+			imlib_blend_image_onto_image(im, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
 			img->multi.frames[img->multi.cnt].im = tmp;
 		}
 
-		clear = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
+		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
+		if (dispose) {
+			px = finfo.frame_x;
+			py = finfo.frame_y;
+			pw = finfo.frame_w;
+			ph = finfo.frame_h;
+		}
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
