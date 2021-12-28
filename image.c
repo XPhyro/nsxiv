@@ -34,17 +34,17 @@
 
 /* TODO: fix version on imlib2 release */
 #if defined(IMLIB2_VERSION) /* && (IMLIB2_VERSION >= IMLIB2_VERSION_(X, X, X)) */
-#define IMLIB2_MULTI_FRAME 1
+#define HAVE_IMLIB2_MULTI_FRAME 1
 #else
-#define IMLIB2_MULTI_FRAME 0
+#define HAVE_IMLIB2_MULTI_FRAME 0
 #endif
 
-#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBGIF && !HAVE_IMLIB2_MULTI_FRAME
 #include <gif_lib.h>
 enum { DEF_GIF_DELAY = 75 };
 #endif
 
-#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBWEBP && !HAVE_IMLIB2_MULTI_FRAME
 #include <webp/decode.h>
 #include <webp/demux.h>
 enum { DEF_WEBP_DELAY = 75 };
@@ -124,7 +124,7 @@ void exif_auto_orientate(const fileinfo_t *file)
 }
 #endif
 
-#if HAVE_LIBGIF || HAVE_LIBWEBP || IMLIB2_MULTI_FRAME
+#if HAVE_LIBGIF || HAVE_LIBWEBP || HAVE_IMLIB2_MULTI_FRAME
 static void img_multiframe_context_set(img_t *img)
 {
 	if (img->multi.cnt > 1) {
@@ -141,7 +141,7 @@ static void img_multiframe_context_set(img_t *img)
 }
 #endif
 
-#if (HAVE_LIBGIF || HAVE_LIBWEBP) && !IMLIB2_MULTI_FRAME
+#if (HAVE_LIBGIF || HAVE_LIBWEBP) && !HAVE_IMLIB2_MULTI_FRAME
 static void img_multiframe_deprication_notice(void)
 {
 	static bool warned;
@@ -161,7 +161,7 @@ static void img_multiframe_deprication_notice(void)
 }
 #endif
 
-#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBGIF && !HAVE_IMLIB2_MULTI_FRAME
 static bool img_load_gif(img_t *img, const fileinfo_t *file)
 {
 	GifFileType *gif;
@@ -332,7 +332,7 @@ static bool img_load_gif(img_t *img, const fileinfo_t *file)
 }
 #endif /* HAVE_LIBGIF */
 
-#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBWEBP && !HAVE_IMLIB2_MULTI_FRAME
 static bool img_load_webp(img_t *img, const fileinfo_t *file)
 {
 	FILE *webp_file;
@@ -420,7 +420,7 @@ fail:
 }
 #endif /* HAVE_LIBWEBP */
 
-#if IMLIB2_MULTI_FRAME
+#if HAVE_IMLIB2_MULTI_FRAME
 /* FIXME: animated webp currently has weird artifacts */
 static bool
 img_load_multiframe(img_t *img, const fileinfo_t *file)
@@ -502,7 +502,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 	return true;
 }
-#endif /* IMLIB2_MULTI_FRAME */
+#endif /* HAVE_IMLIB2_MULTI_FRAME */
 
 Imlib_Image img_open(const fileinfo_t *file)
 {
@@ -512,7 +512,7 @@ Imlib_Image img_open(const fileinfo_t *file)
 	if (access(file->path, R_OK) == 0 &&
 	    stat(file->path, &st) == 0 && S_ISREG(st.st_mode))
 	{
-#if IMLIB2_MULTI_FRAME
+#if HAVE_IMLIB2_MULTI_FRAME
 		im = imlib_load_image_frame(file->path, 1);
 #else
 		im = imlib_load_image(file->path);
@@ -543,16 +543,16 @@ bool img_load(img_t *img, const fileinfo_t *file)
 	exif_auto_orientate(file);
 #endif
 
-#if IMLIB2_MULTI_FRAME
+#if HAVE_IMLIB2_MULTI_FRAME
 	img_load_multiframe(img, file);
 #endif
 
 	if ((fmt = imlib_image_format()) != NULL) {
-#if HAVE_LIBGIF && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBGIF && !HAVE_IMLIB2_MULTI_FRAME
 		if (STREQ(fmt, "gif"))
 			img_load_gif(img, file);
 #endif
-#if HAVE_LIBWEBP && !IMLIB2_MULTI_FRAME
+#if HAVE_LIBWEBP && !HAVE_IMLIB2_MULTI_FRAME
 		if (STREQ(fmt, "webp"))
 			img_load_webp(img, file);
 #endif
