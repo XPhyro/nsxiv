@@ -434,11 +434,8 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
-	if ((fcnt = finfo.frame_count) <= 1) {
-		if (fcnt < 1)
-			error(0, 0, "%s: image has no frames (?)", file->name);
+	if ((fcnt = finfo.frame_count) <= 1)
 		return false;
-	}
 	has_alpha = imlib_image_has_alpha();
 	img->w = finfo.canvas_w;
 	img->h = finfo.canvas_h;
