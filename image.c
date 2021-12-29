@@ -477,7 +477,6 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		}
 		imlib_context_set_image(im); /* TODO: might need to free this */
 		imlib_image_get_frame_info(&finfo);
-
 		sx = finfo.frame_x;
 		sy = finfo.frame_y;
 		sw = finfo.frame_w;
@@ -497,10 +496,10 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
 		if (dispose) { /* remember these so we can "dispose" them before blending next frame */
-			px = finfo.frame_x;
-			py = finfo.frame_y;
-			pw = finfo.frame_w;
-			ph = finfo.frame_h;
+			px = sx;
+			py = sy;
+			pw = sw;
+			ph = sh;
 		}
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
