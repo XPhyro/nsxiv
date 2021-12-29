@@ -490,7 +490,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		imlib_image_set_has_alpha(has_alpha);
 		if (dispose)
 			img_area_clear(px, py, pw, ph);
-		imlib_context_set_blend(n == 1 ? 0 : finfo.frame_flags & IMLIB_FRAME_BLEND);
+		imlib_context_set_blend(finfo.frame_flags & IMLIB_FRAME_BLEND);
 		imlib_blend_image_onto_image(im, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
 		img->multi.frames[img->multi.cnt].im = tmp;
 
