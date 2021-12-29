@@ -440,6 +440,8 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		return false;
 	}
 	has_alpha = imlib_image_has_alpha();
+	img->w = finfo.canvas_w;
+	img->h = finfo.canvas_h;
 
 	if (fcnt > img->multi.cap) {
 		img->multi.cap = fcnt;
@@ -533,6 +535,7 @@ Imlib_Image img_open(const fileinfo_t *file)
 bool img_load(img_t *img, const fileinfo_t *file)
 {
 	const char *fmt;
+	bool animated = false;
 
 	if ((img->im = img_open(file)) == NULL)
 		return false;
@@ -544,7 +547,7 @@ bool img_load(img_t *img, const fileinfo_t *file)
 #endif
 
 #if HAVE_IMLIB2_MULTI_FRAME
-	img_load_multiframe(img, file);
+	animated = img_load_multiframe(img, file);
 #endif
 
 	if ((fmt = imlib_image_format()) != NULL) {
@@ -557,8 +560,11 @@ bool img_load(img_t *img, const fileinfo_t *file)
 			img_load_webp(img, file);
 #endif
 	}
-	img->w = imlib_image_get_width();
-	img->h = imlib_image_get_height();
+	/* img_load_multiframe() sets (the correct) img->w and img->h already */
+	if (!animated) {
+		img->w = imlib_image_get_width();
+		img->h = imlib_image_get_height();
+	}
 	img->checkpan = true;
 	img->dirty = true;
 
