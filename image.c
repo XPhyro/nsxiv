@@ -421,7 +421,14 @@ fail:
 #endif /* HAVE_LIBWEBP */
 
 #if HAVE_IMLIB2_MULTI_FRAME
-/* FIXME: animated webp currently has weird artifacts */
+static void img_area_clear(int x, int y, int w, int h)
+{
+	imlib_image_set_has_alpha(1);
+	imlib_context_set_blend(0);
+	imlib_context_set_color(0, 0, 0, 0);
+	imlib_image_fill_rectangle(x, y, w, h);
+}
+
 static bool
 img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
@@ -446,48 +453,50 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		                             img->multi.cap * sizeof(img_frame_t));
 	}
 
+	imlib_context_set_dither(0);
+	imlib_context_set_anti_alias(0);
+	imlib_context_set_color_modifier(NULL);
+
+	if ((im = imlib_create_image(img->w, img->h)) == NULL)
+		error(EXIT_FAILURE, ENOMEM, NULL);
+	imlib_context_set_image(im);
+	img_area_clear(0, 0, img->w, img->h);
+	img->multi.frames[0].im = im; /* clear canvas */
+
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
+		Imlib_Image tmp;
+		Imlib_Image prev = img->multi.frames[n == 1 ? 0 : img->multi.cnt - 1].im;
+		int sx, sy, sw, sh;
+
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
 			error(0, 0, "%s: error loading frame %d", file->name, n);
 			img_multiframe_context_set(img);
 			return false;
 		}
-		imlib_context_set_image(im);
+		imlib_context_set_image(im); /* TODO: might need to free this */
 		imlib_image_get_frame_info(&finfo);
 
-		if (n == 1) {
-			img->multi.frames[img->multi.cnt].im = im;
-		} else { /* blend on top of the previous image */
-			Imlib_Image tmp;
-			Imlib_Image prev = img->multi.frames[img->multi.cnt - 1].im;
-			int sx = finfo.frame_x;
-			int sy = finfo.frame_y;
-			int sw = finfo.frame_w;
-			int sh = finfo.frame_h;
+		sx = finfo.frame_x;
+		sy = finfo.frame_y;
+		sw = finfo.frame_w;
+		sh = finfo.frame_h;
 
-			imlib_context_set_image(prev);
-			if ((tmp = imlib_clone_image()) == NULL)
-				error(EXIT_FAILURE, ENOMEM, NULL);
-			imlib_context_set_image(tmp);
-			imlib_context_set_dither(0);
-			imlib_image_set_has_alpha(has_alpha);
-			imlib_context_set_anti_alias(0);
-			imlib_context_set_color_modifier(NULL);
-
-			if (dispose) {
-				imlib_context_set_blend(0);
-				imlib_context_set_color(0, 0, 0, 0);
-				imlib_image_fill_rectangle(px, py, pw, ph);
-			}
-			imlib_context_set_blend(1);
-			imlib_blend_image_onto_image(im, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
-			img->multi.frames[img->multi.cnt].im = tmp;
-		}
+		/* blend on top of the previous image */
+		imlib_context_set_image(prev);
+		if ((tmp = imlib_clone_image()) == NULL)
+			error(EXIT_FAILURE, ENOMEM, NULL);
+		imlib_context_set_image(tmp);
+		imlib_image_set_has_alpha(has_alpha);
+		if (dispose)
+			img_area_clear(px, py, pw, ph);
+		imlib_context_set_blend(n == 1 ? 0 : finfo.frame_flags & IMLIB_FRAME_BLEND);
+		imlib_blend_image_onto_image(im, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
+		img->multi.frames[img->multi.cnt].im = tmp;
 
 		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
-		if (dispose) {
+		if (dispose) { /* remember these so we can "dispose" them before blending next frame */
 			px = finfo.frame_x;
 			py = finfo.frame_y;
 			pw = finfo.frame_w;
