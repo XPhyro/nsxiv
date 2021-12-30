@@ -434,7 +434,7 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
 	unsigned int n;
 	unsigned int fcnt;
-	Imlib_Image im;
+	Imlib_Image im, canvas;
 	Imlib_Frame_Info finfo;
 	bool dispose, has_alpha;
 	int px, py, pw, ph;
@@ -457,25 +457,23 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_anti_alias(0);
 	imlib_context_set_color_modifier(NULL);
 
-	if ((im = imlib_create_image(img->w, img->h)) == NULL)
+	if ((canvas = imlib_create_image(img->w, img->h)) == NULL)
 		error(EXIT_FAILURE, ENOMEM, NULL);
-	imlib_context_set_image(im);
+	imlib_context_set_image(canvas);
 	img_area_clear(0, 0, img->w, img->h);
-	img->multi.frames[0].im = im; /* clear canvas */
 
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image tmp;
-		Imlib_Image prev = img->multi.frames[n == 1 ? 0 : img->multi.cnt - 1].im;
+		Imlib_Image prev = n == 1 ? canvas : img->multi.frames[img->multi.cnt - 1].im;
 		int sx, sy, sw, sh;
 
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
 			error(0, 0, "%s: error loading frame %d", file->name, n);
-			img_multiframe_context_set(img);
-			return false;
+			break;
 		}
-		imlib_context_set_image(im); /* TODO: might need to free this */
+		imlib_context_set_image(im);
 		imlib_image_get_frame_info(&finfo);
 		sx = finfo.frame_x;
 		sy = finfo.frame_y;
@@ -504,7 +502,12 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
+
+		imlib_context_set_image(im);
+		imlib_free_image();
 	}
+	imlib_context_set_image(canvas);
+	imlib_free_image();
 	img_multiframe_context_set(img);
 
 	return true;
