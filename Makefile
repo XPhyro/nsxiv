@@ -27,6 +27,7 @@ ICONS = 16x16.png 32x32.png 48x48.png 64x64.png 128x128.png
 inc_fonts_0 =
 inc_fonts_1 = -I/usr/include/freetype2 -I$(PREFIX)/include/freetype2
 
+# TODO: hardcoded -I and -L for convenience, remove them before merging
 CPPFLAGS = -D_XOPEN_SOURCE=700 \
   -DHAVE_LIBGIF=$(HAVE_LIBGIF) -DHAVE_LIBEXIF=$(HAVE_LIBEXIF) \
   -DHAVE_LIBWEBP=$(HAVE_LIBWEBP) -DHAVE_LIBFONTS=$(HAVE_LIBFONTS) \

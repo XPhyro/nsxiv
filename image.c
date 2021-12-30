@@ -429,8 +429,7 @@ static void img_area_clear(int x, int y, int w, int h)
 	imlib_image_fill_rectangle(x, y, w, h);
 }
 
-static bool
-img_load_multiframe(img_t *img, const fileinfo_t *file)
+static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
 	unsigned int n;
 	unsigned int fcnt;
@@ -469,6 +468,10 @@ img_load_multiframe(img_t *img, const fileinfo_t *file)
 		Imlib_Image prev = n == 1 ? canvas : img->multi.frames[img->multi.cnt - 1].im;
 		int sx, sy, sw, sh;
 
+		/* TODO: loading performance is currently pretty bad.
+		 * seems to be due to IO. i assume imlib_load_image_frame() doesn't
+		 * cache the file and is making a read everytime.
+		 */
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL) {
 			error(0, 0, "%s: error loading frame %d", file->name, n);
 			break;
@@ -523,6 +526,7 @@ Imlib_Image img_open(const fileinfo_t *file)
 	    stat(file->path, &st) == 0 && S_ISREG(st.st_mode))
 	{
 #if HAVE_IMLIB2_MULTI_FRAME
+		/* TODO: might not be a good idea to load everything with imlib_load_image_frame() */
 		im = imlib_load_image_frame(file->path, 1);
 #else
 		im = imlib_load_image(file->path);
@@ -586,6 +590,9 @@ CLEANUP void img_close(img_t *img, bool decache)
 	if (img->multi.cnt > 0) {
 		for (i = 0; i < img->multi.cnt; i++) {
 			imlib_context_set_image(img->multi.frames[i].im);
+			/* TODO: probably want to respect decache now that
+			 * we're loading images natively with imlib2
+			 */
 			imlib_free_image();
 		}
 		img->multi.cnt = 0;

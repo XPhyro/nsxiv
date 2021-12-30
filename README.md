@@ -65,6 +65,7 @@ nsxiv requires the following software to be installed:
   * Imlib2
   * X11
 
+<!-- TODO: update opt dependency and put HAVE_LIBGIF and HAVE_LIBWEBP under deprecated category -->
 The following dependencies are optional.
 
   * inotify : Used for auto-reloading images on change.
