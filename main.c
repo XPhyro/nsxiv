@@ -56,7 +56,6 @@ appmode_t mode;
 arl_t arl;
 img_t img;
 tns_t tns;
-win_t win;
 
 fileinfo_t *files;
 int filecnt, fileidx;
