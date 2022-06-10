@@ -127,7 +127,7 @@ Installing all of the above:
 
     # make install-all
 
-Please note, that these requires root privileges.
+Please note, that these require root privileges.
 By default, nsxiv is installed using the prefix `/usr/local`, so the full path
 of the executable will be `/usr/local/bin/nsxiv`, the `.desktop` entry will be
 `/usr/local/share/applications/nsxiv.desktop` and the icon path will be
