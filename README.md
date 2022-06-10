@@ -56,7 +56,7 @@ Installing via package manager
 ------------------------------
 
 <a href="https://repology.org/project/nsxiv/versions">
-    <img align="right" width="192" src="https://repology.org/badge/vertical-allrepos/nsxiv.svg">
+  <img align="right" width="192" src="https://repology.org/badge/vertical-allrepos/nsxiv.svg">
 </a>
 
 nsxiv is available on the following distributions/repositories. If you don't see
