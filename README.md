@@ -1,4 +1,4 @@
-[![nsxiv](https://raw.githubusercontent.com/nsxiv/nsxiv/gh-pages/img/logo.png)](https://codeberg.org/nsxiv/nsxiv)
+[![nsxiv](https://codeberg.org/nsxiv/pages/raw/branch/master/img/logo.png)](https://codeberg.org/nsxiv/nsxiv)
 
 [![tags](https://img.shields.io/github/v/tag/nsxiv/nsxiv?style=flat-square)](https://codeberg.org/nsxiv/nsxiv/tags)
 [![license](https://img.shields.io/badge/license-GPL--2.0-lightgreen?style=flat-square)](https://codeberg.org/nsxiv/nsxiv/src/branch/master/LICENSE)
@@ -45,11 +45,11 @@ Screenshots
 
 **Image mode: (Default colors)**
 
-![Image](https://raw.githubusercontent.com/nsxiv/nsxiv/gh-pages/img/image.png "Image mode")
+![Image](https://codeberg.org/nsxiv/pages/raw/branch/master/img/image.png "Image mode")
 
 **Thumbnail mode: (Custom colors)**
 
-![Thumb](https://raw.githubusercontent.com/nsxiv/nsxiv/gh-pages/img/thumb.png "Thumb mode")
+![Thumb](https://codeberg.org/nsxiv/pages/raw/branch/master/img/thumb.png "Thumb mode")
 
 
 Installing via package manager
