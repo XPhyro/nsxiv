@@ -1,16 +1,20 @@
-[![nsxiv](https://raw.githubusercontent.com/nsxiv/nsxiv/gh-pages/img/logo.png)](https://github.com/nsxiv/nsxiv)
+[![nsxiv](https://raw.githubusercontent.com/nsxiv/nsxiv/gh-pages/img/logo.png)](https://codeberg.org/nsxiv/nsxiv)
 
-[![tags](https://img.shields.io/github/v/tag/nsxiv/nsxiv?style=flat-square)](https://github.com/nsxiv/nsxiv/tags)
-[![license](https://img.shields.io/badge/license-GPL--2.0-lightgreen?style=flat-square)](https://github.com/nsxiv/nsxiv/blob/master/LICENSE)
-[![loc](https://img.shields.io/tokei/lines/github/nsxiv/nsxiv?color=red&style=flat-square)](https://github.com/nsxiv/nsxiv)
-
-<p align="center">
-<a href="https://github.com/nsxiv/nsxiv" alt="GitHub"><img src="https://img.shields.io/badge/Github-2B3137?style=for-the-badge&logo=Github&logoColor=FFFFFF"></a>
-<a href="https://codeberg.org/nsxiv/nsxiv" alt="CodeBerg"><img src="https://img.shields.io/badge/Codeberg-2185D0?style=for-the-badge&logo=codeberg&logoColor=F2F8FC"></a>
-</p>
+[![tags](https://img.shields.io/github/v/tag/nsxiv/nsxiv?style=flat-square)](https://codeberg.org/nsxiv/nsxiv/tags)
+[![license](https://img.shields.io/badge/license-GPL--2.0-lightgreen?style=flat-square)](https://codeberg.org/nsxiv/nsxiv/src/branch/master/LICENSE)
+[![loc](https://img.shields.io/tokei/lines/github/nsxiv/nsxiv?color=red&style=flat-square)](https://codeberg.org/nsxiv/nsxiv)
 
 **Neo (or New or Not) Simple (or Small or Suckless) X Image Viewer**
 --------------------------------------------------------------------
+
+<p align="center">
+  <a href="https://codeberg.org/nsxiv/nsxiv" alt="CodeBerg">
+    <img src="https://img.shields.io/badge/Hosted_at-Codeberg-%232185D0?style=for-the-badge&logo=CodeBerg">
+  </a>
+  <a href="https://github.com/nsxiv/nsxiv" alt="GitHub">
+    <img src="https://img.shields.io/badge/Mirrored_at-GitHub-%2324292F?style=for-the-badge&logo=github">
+  </a>
+</p>
 
 nsxiv is a fork of now unmaintained [sxiv](https://github.com/muennich/sxiv)
 with the purpose of being a drop-in replacement of sxiv, maintaining it and
@@ -158,18 +162,18 @@ F.A.Q
 -----
 
 * Can I open remote urls with nsxiv? <br>
-Yes, see [nsxiv-url](https://github.com/nsxiv/nsxiv-extra/tree/master/scripts/nsxiv-url)
+Yes, see [nsxiv-url](https://codeberg.org/nsxiv/nsxiv-extra/src/branch/master/scripts/nsxiv-url)
 
 * Can I open all the images in a directory? <br>
-Yes, see [nsxiv-rifle](https://github.com/nsxiv/nsxiv-extra/tree/master/scripts/nsxiv-rifle)
+Yes, see [nsxiv-rifle](https://codeberg.org/nsxiv/nsxiv-extra/src/branch/master/scripts/nsxiv-rifle)
 
 * Can I set default arguments for nsxiv? <br>
-Yes, see [nsxiv-env](https://github.com/nsxiv/nsxiv-extra/tree/master/scripts/nsxiv-env)
+Yes, see [nsxiv-env](https://codeberg.org/nsxiv/nsxiv-extra/src/branch/master/scripts/nsxiv-env)
 
 * Can I pipe images into nsxiv? <br>
-Yes, see [nsxiv-pipe](https://github.com/nsxiv/nsxiv-extra/tree/master/scripts/nsxiv-pipe)
+Yes, see [nsxiv-pipe](https://codeberg.org/nsxiv/nsxiv-extra/src/branch/master/scripts/nsxiv-pipe)
 
-You may also wish to see the [known issues](https://github.com/nsxiv/nsxiv/issues/242).
+You may also wish to see the [known issues](https://codeberg.org/nsxiv/nsxiv/issues/242).
 
 
 Customization
@@ -178,11 +182,11 @@ Customization
 The main method of customizing nsxiv is by setting values for the variables in *config.h*,
 or by using Xresources as explained in the manual. If these options are not sufficient,
 you may implement your own features by following
-[this guide](https://github.com/nsxiv/nsxiv-extra/blob/master/CUSTOMIZATION.md).
+[this guide](https://codeberg.org/nsxiv/nsxiv-extra/blob/master/CUSTOMIZATION.md).
 
 Due to our limited [project scope](CONTRIBUTING.md#Project-Scope), certain features or
 customization cannot be merged into nsxiv mainline. Following the spirit of suckless
-software, we host the [nsxiv-extra](https://github.com/nsxiv/nsxiv-extra) repo where users
+software, we host the [nsxiv-extra](https://codeberg.org/nsxiv/nsxiv-extra) repo where users
 are free to submit whatever patches or scripts they wish.
 
 If you think your custom features can be beneficial for the general user base and is within
@@ -190,16 +194,16 @@ our project scope, please submit it as a pull request on this repository, then w
 merge it to mainline.
 
 Description on how to use or submit patches can be found on
-nsxiv-extra's [README](https://github.com/nsxiv/nsxiv-extra).
+nsxiv-extra's [README](https://codeberg.org/nsxiv/nsxiv-extra).
 
 
 Download
 --------
 
-You can [browse](https://github.com/nsxiv/nsxiv) the source code repository
-on GitHub or get a copy using git with the following command:
+You can [browse](https://codeberg.org/nsxiv/nsxiv) the source code repository
+on CodeBerg or get a copy using git with the following command:
 
-    $ git clone https://github.com/nsxiv/nsxiv.git
+    $ git clone https://codeberg.org/nsxiv/nsxiv.git
 
 You can view the changelog [here](CHANGELOG.md)
 
