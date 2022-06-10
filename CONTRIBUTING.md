@@ -69,7 +69,6 @@ For releases, the process is the following:
       release, the "Added" section for new features, and the "Fixes" section
       for fixed bugs or regressions. Include pull request IDs.
 
-<!-- TODO: update the link -->
 For mundane development related talks which don't warrant their own issue, use
-the [general-dev](https://github.com/nsxiv/nsxiv/discussions/119) discussion
+the [general-dev](https://codeberg.org/nsxiv/nsxiv/issues/294) discussion
 thread.
