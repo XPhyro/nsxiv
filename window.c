@@ -115,6 +115,7 @@ void win_init(win_t *win)
 	XVisualInfo vis;
 	float alpha;
 	char *endptr;
+	static char lbuf[512 + 3], rbuf[64 + 3]; /* needed for transparency */
 
 	memset(win, 0, sizeof(win_t));
 
