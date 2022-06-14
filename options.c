@@ -33,19 +33,6 @@ void print_usage(void)
 	       "[-z ZOOM] FILES...\n");
 }
 
-static void title_deprecation_notice(void)
-{
-	error(EXIT_FAILURE, 0, "\n"
-	      "################################################################\n"
-	      "#                      DEPRECATION NOTICE                      #\n"
-	      "################################################################\n"
-	      "# `-T` option has been deprecated in favour of `win-title`.    #\n"
-	      "# Please read the `WINDOW TITLE` section of the manpage for    #\n"
-	      "# more info.                                                   #\n"
-	      "################################################################"
-	);
-}
-
 static void print_version(void)
 {
 	puts("nsxiv " VERSION);
@@ -86,7 +73,7 @@ void parse_options(int argc, char **argv)
 	_options.clean_cache = false;
 	_options.private_mode = false;
 
-	while ((opt = getopt(argc, argv, "A:abce:fG:g:hin:N:opqrS:s:T:tvZz:0")) != -1) {
+	while ((opt = getopt(argc, argv, "A:abce:fG:g:hin:N:opqrS:s:tvZz:0")) != -1) {
 		switch (opt) {
 			case '?':
 				print_usage();
@@ -162,9 +149,6 @@ void parse_options(int argc, char **argv)
 				if (s == NULL || *s == '\0' || strlen(optarg) != 1)
 					error(EXIT_FAILURE, 0, "Invalid argument for option -s: %s", optarg);
 				_options.scalemode = s - scalemodes;
-				break;
-			case 'T':
-				title_deprecation_notice(); /* TODO(v30): remove this option */
 				break;
 			case 't':
 				_options.thumb_mode = true;
