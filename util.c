@@ -229,10 +229,10 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 {
 	pid_t pid;
 	spawn_t status = { -1, -1, -1 };
-	int pfd_read[2] = { -1, -1 };
-	int pfd_write[2] = { -1, -1 };
+	int pfd_read[2], pfd_write[2];
 	const bool r = flags & X_READ;
 	const bool w = flags & X_WRITE;
+	int forkerr;
 
 	if (cmd == NULL || argv == NULL || flags == 0)
 		return status;
@@ -243,16 +243,18 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 	}
 
 	if (w && pipe(pfd_write) < 0) {
+		error(0, errno, "pipe: %s", cmd);
 		if (r) {
 			close(pfd_read[0]);
 			close(pfd_read[1]);
 		}
-		error(0, errno, "pipe: %s", cmd);
 		return status;
 	}
 
 	if ((pid = fork()) == 0) {
 		bool err = (r && dup2(pfd_read[1], 1) < 0) || (w && dup2(pfd_write[0], 0) < 0);
+		int dup2err = errno;
+
 		if (r) {
 			close(pfd_read[0]);
 			close(pfd_read[1]);
@@ -261,12 +263,13 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 			close(pfd_write[0]);
 			close(pfd_write[1]);
 		}
-
 		if (err)
-			error(EXIT_FAILURE, errno, "dup2: %s", cmd);
+			error(EXIT_FAILURE, dup2err, "dup2: %s", cmd);
+
 		execv(cmd, argv);
 		error(EXIT_FAILURE, errno, "exec: %s", cmd);
 	}
+	forkerr = errno;
 
 	if (r)
 		close(pfd_read[1]);
@@ -278,7 +281,7 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 			close(pfd_read[0]);
 		if (w)
 			close(pfd_write[1]);
-		error(0, errno, "fork: %s", cmd);
+		error(0, forkerr, "fork: %s", cmd);
 		return status;
 	}
 
