@@ -252,8 +252,8 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 	}
 
 	if ((pid = fork()) == 0) {
-		bool err = (r && dup2(pfd_read[1], 1) < 0) || (w && dup2(pfd_write[0], 0) < 0);
-		int dup2err = errno;
+		if ((r && dup2(pfd_read[1], 1) < 0) || (w && dup2(pfd_write[0], 0) < 0))
+			error(EXIT_FAILURE, errno, "dup2: %s", cmd);
 
 		if (r) {
 			close(pfd_read[0]);
@@ -263,8 +263,6 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 			close(pfd_write[0]);
 			close(pfd_write[1]);
 		}
-		if (err)
-			error(EXIT_FAILURE, dup2err, "dup2: %s", cmd);
 
 		execv(cmd, argv);
 		error(EXIT_FAILURE, errno, "exec: %s", cmd);
