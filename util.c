@@ -229,7 +229,7 @@ spawn_t spawn(const char *cmd, char *const argv[], unsigned int flags)
 {
 	pid_t pid;
 	spawn_t status = { -1, -1, -1 };
-	int pfd_read[2], pfd_write[2];
+	int pfd_read[2] = { -1, -1 }, pfd_write[2] = { -1, -1 };
 	const bool r = flags & X_READ;
 	const bool w = flags & X_WRITE;
 	int forkerr;
