@@ -205,9 +205,12 @@ int r_mkdir(char *path)
 		for (; *s != '\0' && *s != '/'; s++);
 		c = *s;
 		*s = '\0';
-		if (mkdir(path, 0755) == -1)
-			if (errno != EEXIST || stat(path, &st) == -1 || !S_ISDIR(st.st_mode))
+		if (mkdir(path, 0755) == -1) {
+			if (errno != EEXIST || stat(path, &st) == -1 || !S_ISDIR(st.st_mode)) {
+				error(0, errno, "%s", path);
 				rc = -1;
+			}
+		}
 		*s = c;
 	}
 	return rc;
