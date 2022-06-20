@@ -20,13 +20,9 @@
 #ifndef NSXIV_H
 #define NSXIV_H
 
-#include <stdarg.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/types.h>
+
 #include <Imlib2.h>
-#include <X11/Xlib.h>
 
 /*
  * Annotation for functions called in cleanup().

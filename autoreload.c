@@ -16,6 +16,8 @@
  * along with nsxiv.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdbool.h>
+
 #include "nsxiv.h"
 
 #if HAVE_INOTIFY

@@ -17,24 +17,28 @@
  * along with nsxiv.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <locale.h>
+#include <poll.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <X11/XF86keysym.h>
+#include <X11/keysym.h>
+
 #include "nsxiv.h"
 #define _MAPPINGS_CONFIG
 #include "commands.h"
 #include "config.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <locale.h>
-#include <signal.h>
-#include <poll.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <X11/keysym.h>
-#include <X11/XF86keysym.h>
 
 #define MODMASK(mask) ((mask) & USED_MODMASK)
 #define BAR_SEP "  "
