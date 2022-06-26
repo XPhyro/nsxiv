@@ -415,6 +415,8 @@ static int win_draw_text(win_t *win, XftDraw *d, const XftColor *color,
 
 	for (t = text; t - text < len; t = next) {
 		next = utf8_decode(t, &rune, &err);
+		if (err)
+			continue;
 		if (XftCharExists(win->env.dpy, font, rune)) {
 			f = font;
 		} else { /* fallback font */
