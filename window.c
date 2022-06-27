@@ -414,6 +414,7 @@ static int win_draw_text(win_t *win, XftDraw *d, const XftColor *color,
 	XGlyphInfo ext;
 
 	for (t = text; t - text < len; t = next) {
+		err = 0;
 		next = utf8_decode(t, &rune, &err);
 		if (err)
 			continue;
