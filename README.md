@@ -202,19 +202,6 @@ on CodeBerg or get a copy using git with the following command:
 You can view the changelog [here](CHANGELOG.md)
 
 
-Differences From sxiv
----------------------
-
-nsxiv aims to be a mostly-drop-in replacement to sxiv. There are a couple minor
-differences that are backwards incompatible:
-
-* *config.h*: If you are migrating your config from sxiv, you will have to edit
-  it to be able to compile nsxiv. You can reference [the default config](config.def.h)
-  while editing.
-* Xresources: sxiv's entries start with Sxiv whereas nsxiv's start with Nsxiv.
-  nsxiv does not additionally respect Sxiv entries.
-
-
 Similar projects
 ----------------
 
