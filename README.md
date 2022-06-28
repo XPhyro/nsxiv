@@ -94,7 +94,7 @@ packages (e.g. \*-dev on Debian).
   and linking against [libinotify-kqueue][].
 
 [inotify]: https://www.man7.org/linux/man-pages/man7/inotify.7.html
-[libinotify-kqueue]: https://github.com/libinotify-kqueue/libinotify-kqueue
+[libinotify]: https://github.com/libinotify-kqueue/libinotify-kqueue
 
 
 Building
