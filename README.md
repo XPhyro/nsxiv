@@ -28,7 +28,7 @@ Features
 * Basic support for animated/multi-frame images
 * Thumbnail mode: grid of selectable previews of all images
 * Ability to cache thumbnails for fast re-loading
-* Automatically refreshing modified images (only on Linux)
+* Automatically refreshing modified images
 * Customizable keyboard and mouse mappings via `config.h`
 * Scriptability via `key-handler`
 * Displaying image information in status bar via `image-info` & `thumb-info`
@@ -73,21 +73,28 @@ nsxiv requires the following software to be installed:
 
 The following dependencies are optional.
 
-  * inotify : Used for auto-reloading images on change.
-    Disabled via `HAVE_INOTIFY=0`
-  * libXft, freetype2, fontconfig : Used for the status bar.
-    Disabled via `HAVE_LIBFONTS=0`
-  * giflib : Used for animated gif playback.
+  * `inotify`<sup>ℹ</sup>: Used for auto-reloading images on change.
+    Disabled via `HAVE_INOTIFY=0`.
+  * `libXft`, `freetype2`, `fontconfig`: Used for the status bar.
+    Disabled via `HAVE_LIBFONTS=0`.
+  * `giflib`: Used for animated gif playback.
     Disabled via `HAVE_LIBGIF=0`.
-  * libexif : Used for auto-orientation and exif thumbnails.
-    Disable via `HAVE_LIBEXIF=0`
-  * libwebp : Used for animated webp playback.
-    (NOTE: animated webp also requires Imlib2 v1.7.5 or above)
+  * `libexif`: Used for auto-orientation and exif thumbnails.
+    Disable via `HAVE_LIBEXIF=0`.
+  * `libwebp`: Used for animated webp playback.
+    (***NOTE***: animated webp also requires Imlib2 v1.7.5 or above)
     Disabled via `HAVE_LIBWEBP=0`.
 
 Please make sure to install the corresponding development packages in case that
 you want to build nsxiv on a distribution with separate runtime and development
 packages (e.g. \*-dev on Debian).
+
+\[ℹ]: [inotify][] is a linux specific syscall for monitoring filesystem
+  changes. It's not natively available on `*BSD` systems but can be enabed via
+  installing and linking against [libinotify][].
+
+[inotify]: https://www.man7.org/linux/man-pages/man7/inotify.7.html
+[libinotify]: https://github.com/libinotify-kqueue/libinotify-kqueue
 
 
 Building
