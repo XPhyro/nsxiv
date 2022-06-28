@@ -9,22 +9,23 @@
 --------------------------------------------------------------------
 
 nsxiv is a fork of the now-unmaintained [sxiv](https://github.com/muennich/sxiv)
-with the purpose of being a (mostly) drop-in replacement for sxiv, maintaining it
-and adding simple, sensible features. nsxiv is free software licensed under GPLv2
-and aims to be easy to modify and customize.
+with the purpose of being a (mostly) drop-in replacement for sxiv, maintaining its
+interface and adding simple, sensible features. nsxiv is free software licensed
+under GPLv2 and aims to be easy to modify and customize.
 
-Please file a bug report if something does not work as documented or
-expected on [Codeberg](https://codeberg.org/nsxiv/nsxiv/issues/new)
-after making sure you are using the latest release. Contributions are
-welcome, see [CONTRIBUTING.md](CONTRIBUTING.md#contribution-guideline)
-to get started.
+Please file a bug report if something does not work as documented or expected on
+[Codeberg] after making sure you are using the latest release.  Contributions
+are welcome, see [CONTRIBUTING.md] to get started.
+
+[Codeberg]: https://codeberg.org/nsxiv/nsxiv/issues/new
+[CONTRIBUTING.md]: CONTRIBUTING.md#contribution-guideline
 
 
 Features
 --------
 
 * Basic image operations like zooming, panning, rotating
-* Basic support for animated/multi-frame images (GIF/WebP)
+* Basic support for animated/multi-frame images
 * Thumbnail mode: grid of selectable previews of all images
 * Ability to cache thumbnails for fast re-loading
 * Automatically refreshing modified images (only on Linux)
