@@ -2,9 +2,9 @@ branches: master
 
 pipeline:
   analysis:
-    image: alpine
+    image: alpine:edge
     commands: |
-      apk add --no-cache build-base cppcheck clang-extra-tools \
+      apk add --no-cache build-base cppcheck clang-extra-tools clang-analyzer \
           imlib2-dev xorgproto \
           libxft-dev libexif-dev giflib-dev libwebp-dev >/dev/null
       make config.h version.h
@@ -22,7 +22,12 @@ pipeline:
         clang-tidy --warnings-as-errors="*" --checks="$checks" --quiet *.c \
                    -- -std="$std" $(make OPT_DEP_DEFAULT="$1" dump_cppflags)
       }
+      run_scanbuild() {
+        scan-build --status-bugs -no-failure-reports make OPT_DEP_DEFAULT="$1"
+      }
       run_cppcheck "0"
       run_cppcheck "1"
       run_tidy "0"
       run_tidy "1"
+      run_scanbuild "0"
+      run_scanbuild "1"
