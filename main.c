@@ -40,7 +40,7 @@
 #include <X11/XF86keysym.h>
 #include <X11/keysym.h>
 
-#define MODMASK(mask) ((mask) & USED_MODMASK)
+#define MODMASK(mask) (USED_MODMASK & (mask))
 #define BAR_SEP "  "
 
 #define TV_DIFF(t1,t2) (((t1)->tv_sec  - (t2)->tv_sec ) * 1000 + \
@@ -176,8 +176,8 @@ void remove_file(int n, bool manual)
 				imlib_context_set_image(tns.thumbs[n].im);
 				imlib_free_image_and_decache();
 			}
-			memmove(tns.thumbs + n, tns.thumbs + n + 1, (filecnt - n - 1) *
-			        sizeof(*tns.thumbs));
+			memmove(tns.thumbs + n, tns.thumbs + n + 1,
+			        (filecnt - n - 1) * sizeof(*tns.thumbs));
 			memset(tns.thumbs + filecnt - 1, 0, sizeof(*tns.thumbs));
 		}
 		memmove(files + n, files + n + 1, (filecnt - n - 1) * sizeof(*files));
@@ -343,7 +343,7 @@ void load_image(int new)
 		if (new >= filecnt)
 			new = filecnt - 1;
 		else if (new > 0 && prev)
-			new--;
+			new -= 1;
 	}
 	files[new].flags &= ~FF_WARN;
 	fileidx = current = new;
@@ -531,8 +531,9 @@ void handle_key_handler(bool init)
 		return;
 	if (init) {
 		close_info();
-		snprintf(win.bar.l.buf, win.bar.l.size, "Getting key handler input "
-		         "(%s to abort)...", XKeysymToString(KEYHANDLER_ABORT));
+		snprintf(win.bar.l.buf, win.bar.l.size,
+		         "Getting key handler input (%s to abort)...",
+		         XKeysymToString(KEYHANDLER_ABORT));
 	} else { /* abort */
 		open_info();
 		update_info();
@@ -698,7 +699,7 @@ static void on_buttonpress(const XButtonEvent *bev)
 
 static void run(void)
 {
-	enum { FD_X, FD_INFO, FD_ARL, FD_CNT };
+	enum fds { FD_X, FD_INFO, FD_ARL, FD_CNT };
 	struct pollfd pfd[FD_CNT];
 	int timeout = 0;
 	const struct timespec ten_ms = {0, 10000000};
@@ -711,8 +712,8 @@ static void run(void)
 		init_thumb = mode == MODE_THUMB && tns.initnext < filecnt;
 		load_thumb = mode == MODE_THUMB && tns.loadnext < tns.end;
 
-		if ((init_thumb || load_thumb || to_set || info.fd != -1 ||
-		     arl.fd != -1) && XPending(win.env.dpy) == 0)
+		if ((init_thumb || load_thumb || to_set || info.fd != -1 || arl.fd != -1) &&
+		    XPending(win.env.dpy) == 0)
 		{
 			if (load_thumb) {
 				set_timeout(redraw, TO_REDRAW_THUMBS, false);
@@ -760,8 +761,8 @@ static void run(void)
 						discard = ev.type == nextev.type;
 						break;
 					case KeyPress:
-						discard = (nextev.type == KeyPress || nextev.type == KeyRelease)
-						          && ev.xkey.keycode == nextev.xkey.keycode;
+						discard = (nextev.type == KeyPress || nextev.type == KeyRelease) &&
+						          ev.xkey.keycode == nextev.xkey.keycode;
 						break;
 				}
 			}

@@ -254,8 +254,9 @@ static bool img_load_gif(img_t *img, const fileinfo_t *file)
 					if (i < y || i >= y + h || j < x || j >= x + w ||
 					    rows[i-y][j-x] == transp)
 					{
-						if (prev_frame != NULL && (prev_disposal != 2 ||
-						    i < py || i >= py + ph || j < px || j >= px + pw))
+						if (prev_frame != NULL &&
+						    (prev_disposal != 2 || i < py || i >= py + ph ||
+						     j < px || j >= px + pw))
 						{
 							*ptr = prev_frame[i * sw + j];
 						} else {
@@ -383,8 +384,8 @@ static bool img_load_webp(img_t *img, const fileinfo_t *file)
 	/* Load and decode frames (also works on images with only 1 frame) */
 	img->multi.cnt = img->multi.sel = 0;
 	while (WebPAnimDecoderGetNext(dec, &buf, &ts)) {
-		im = imlib_create_image_using_copied_data(
-		     info.canvas_width, info.canvas_height, (DATA32*)buf);
+		im = imlib_create_image_using_copied_data(info.canvas_width, info.canvas_height,
+		                                          (DATA32*)buf);
 		imlib_context_set_image(im);
 		imlib_image_set_format("webp");
 		/* Get an iterator of this frame - used for frame info (duration, etc.) */
@@ -688,8 +689,8 @@ bool img_zoom_to(img_t *img, float z)
 bool img_zoom(img_t *img, int d)
 {
 	int i = d > 0 ? 0 : ARRLEN(zoom_levels)-1;
-	while (i >= 0 && i < ARRLEN(zoom_levels) && (d > 0 ?
-	       zoom_levels[i]/100 <= img->zoom : zoom_levels[i]/100 >= img->zoom))
+	while (i >= 0 && i < ARRLEN(zoom_levels) &&
+	       (d > 0 ? zoom_levels[i]/100 <= img->zoom : zoom_levels[i]/100 >= img->zoom))
 	{
 		i += d;
 	}
