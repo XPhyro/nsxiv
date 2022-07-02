@@ -98,7 +98,7 @@ bool arl_handle(arl_t *arl)
 			break;
 		}
 		for (ptr = buf.d; ptr < buf.d + len; ptr += sizeof(*e) + e->len) {
-			e = (const struct inotify_event*) ptr;
+			e = (const struct inotify_event *)ptr;
 			if (e->wd == arl->wd_file && (e->mask & IN_CLOSE_WRITE)) {
 				reload = true;
 			} else if (e->wd == arl->wd_file && (e->mask & IN_DELETE_SELF)) {
@@ -121,18 +121,18 @@ void arl_init(arl_t *arl)
 
 void arl_cleanup(arl_t *arl)
 {
-	(void) arl;
+	(void)arl;
 }
 
 void arl_setup(arl_t *arl, const char *filepath)
 {
-	(void) arl;
-	(void) filepath;
+	(void)arl;
+	(void)filepath;
 }
 
 bool arl_handle(arl_t *arl)
 {
-	(void) arl;
+	(void)arl;
 	return false;
 }
 

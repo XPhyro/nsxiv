@@ -43,12 +43,13 @@
 #define MODMASK(mask) (USED_MODMASK & (mask))
 #define BAR_SEP "  "
 
-#define TV_DIFF(t1,t2) (((t1)->tv_sec  - (t2)->tv_sec ) * 1000 + \
-                        ((t1)->tv_usec - (t2)->tv_usec) / 1000)
-#define TV_ADD_MSEC(tv,t) {             \
-  (tv)->tv_sec  += (t) / 1000;          \
-  (tv)->tv_usec += (t) % 1000 * 1000;   \
-}
+#define TV_DIFF(t1, t2) (((t1)->tv_sec - (t2)->tv_sec) * 1000 + \
+	                 ((t1)->tv_usec - (t2)->tv_usec) / 1000)
+#define TV_ADD_MSEC(tv, t)                          \
+	{                                           \
+		(tv)->tv_sec += (t) / 1000;         \
+		(tv)->tv_usec += (t) % 1000 * 1000; \
+	}
 
 typedef struct {
 	struct timeval when;
@@ -99,10 +100,10 @@ static struct {
 bool title_dirty;
 
 static timeout_t timeouts[] = {
-	{ { 0, 0 }, false, redraw       },
+	{ { 0, 0 }, false, redraw },
 	{ { 0, 0 }, false, reset_cursor },
-	{ { 0, 0 }, false, slideshow    },
-	{ { 0, 0 }, false, animate      },
+	{ { 0, 0 }, false, slideshow },
+	{ { 0, 0 }, false, animate },
 	{ { 0, 0 }, false, clear_resize },
 };
 
@@ -120,8 +121,8 @@ static void cleanup(void)
 static bool xgetline(char **lineptr, size_t *n)
 {
 	ssize_t len = getdelim(lineptr, n, options->using_null ? '\0' : '\n', stdin);
-	if (!options->using_null && len > 0 && (*lineptr)[len-1] == '\n')
-		(*lineptr)[len-1] = '\0';
+	if (!options->using_null && len > 0 && (*lineptr)[len - 1] == '\n')
+		(*lineptr)[len - 1] = '\0';
 	return len > 0;
 }
 
@@ -143,7 +144,7 @@ static void check_add_file(char *filename, bool given)
 	if (fileidx == filecnt) {
 		filecnt *= 2;
 		files = erealloc(files, filecnt * sizeof(*files));
-		memset(&files[filecnt/2], 0, filecnt/2 * sizeof(*files));
+		memset(&files[filecnt / 2], 0, filecnt / 2 * sizeof(*files));
 	}
 
 	files[fileidx].name = estrdup(filename);
@@ -167,8 +168,8 @@ void remove_file(int n, bool manual)
 		markcnt--;
 
 	if (files[n].path != files[n].name)
-		free((void*) files[n].path);
-	free((void*) files[n].name);
+		free((void *)files[n].path);
+	free((void *)files[n].name);
 
 	if (n + 1 < filecnt) {
 		if (tns.thumbs != NULL) {
@@ -259,13 +260,13 @@ static size_t get_win_title(char *buf, size_t len)
 		snprintf(h, ARRLEN(h), "%d", img.h);
 		snprintf(z, ARRLEN(z), "%d", (int)(img.zoom * 100));
 	}
-	snprintf(fidx, ARRLEN(fidx), "%d", fileidx+1);
+	snprintf(fidx, ARRLEN(fidx), "%d", fileidx + 1);
 	snprintf(fcnt, ARRLEN(fcnt), "%d", filecnt);
 	construct_argv(argv, ARRLEN(argv), wintitle.f.cmd, files[fileidx].path,
 	               fidx, fcnt, w, h, z, NULL);
 	pfd = spawn(wintitle.f.cmd, argv, X_READ);
 	if (pfd.readfd >= 0) {
-		if ((n = read(pfd.readfd, buf, len-1)) > 0)
+		if ((n = read(pfd.readfd, buf, len - 1)) > 0)
 			buf[n] = '\0';
 		close(pfd.readfd);
 	}
@@ -392,7 +393,8 @@ static void update_info(void)
 	/* update bar contents */
 	if (win.bar.h == 0 || extprefix)
 		return;
-	for (fw = 0, i = filecnt; i > 0; fw++, i /= 10);
+	for (fw = 0, i = filecnt; i > 0; fw++, i /= 10)
+		;
 	mark = files[fileidx].flags & FF_MARK ? "* " : "";
 	l->p = l->buf;
 	r->p = r->buf;
@@ -414,9 +416,10 @@ static void update_info(void)
 		}
 		if (img.gamma)
 			bar_put(r, "G%+d" BAR_SEP, img.gamma);
-		bar_put(r, "%3d%%" BAR_SEP, (int) (img.zoom * 100.0));
+		bar_put(r, "%3d%%" BAR_SEP, (int)(img.zoom * 100.0));
 		if (img.multi.cnt > 0) {
-			for (fn = 0, i = img.multi.cnt; i > 0; fn++, i /= 10);
+			for (fn = 0, i = img.multi.cnt; i > 0; fn++, i /= 10)
+				;
 			bar_put(r, "%0*d/%d" BAR_SEP, fn, img.multi.sel + 1, img.multi.cnt);
 		}
 		bar_put(r, "%0*d/%d", fw, fileidx + 1, filecnt);
@@ -438,7 +441,7 @@ int nav_button(void)
 
 	if (x < nw)
 		return 0;
-	else if (x < win.w-nw)
+	else if (x < win.w - nw)
 		return 1;
 	else
 		return 2;
@@ -572,8 +575,8 @@ static bool run_key_handler(const char *key, unsigned int mask)
 
 	snprintf(kstr, sizeof(kstr), "%s%s%s%s",
 	         mask & ControlMask ? "C-" : "",
-	         mask & Mod1Mask    ? "M-" : "",
-	         mask & ShiftMask   ? "S-" : "", key);
+	         mask & Mod1Mask ? "M-" : "",
+	         mask & ShiftMask ? "S-" : "", key);
 	construct_argv(argv, ARRLEN(argv), keyhandler.f.cmd, kstr, NULL);
 	pfd = spawn(keyhandler.f.cmd, argv, X_WRITE);
 	if (pfd.writefd < 0)
@@ -593,7 +596,8 @@ static bool run_key_handler(const char *key, unsigned int mask)
 		}
 	}
 	fclose(pfs);
-	while (waitpid(pfd.pid, NULL, 0) == -1 && errno == EINTR);
+	while (waitpid(pfd.pid, NULL, 0) == -1 && errno == EINTR)
+		;
 
 	for (f = i = 0; f < fcnt; i++) {
 		if ((marked && (files[i].flags & FF_MARK)) || (!marked && i == fileidx)) {
@@ -610,7 +614,8 @@ static bool run_key_handler(const char *key, unsigned int mask)
 		}
 	}
 	/* drop user input events that occurred while running the key handler */
-	while (XCheckIfEvent(win.env.dpy, &dump, is_input_ev, NULL));
+	while (XCheckIfEvent(win.env.dpy, &dump, is_input_ev, NULL))
+		;
 
 	if (mode == MODE_IMAGE) {
 		if (changed) {
@@ -671,7 +676,7 @@ static void on_keypress(XKeyEvent *kev)
 			handle_key_handler(false);
 	} else if (key >= '0' && key <= '9') {
 		/* number prefix for commands */
-		prefix = prefix * 10 + (int) (key - '0');
+		prefix = prefix * 10 + (int)(key - '0');
 		return;
 	} else {
 		dirty = process_bindings(keys, ARRLEN(keys), ksym, kev->state, sh);
@@ -699,10 +704,13 @@ static void on_buttonpress(const XButtonEvent *bev)
 
 static void run(void)
 {
-	enum fds { FD_X, FD_INFO, FD_ARL, FD_CNT };
+	enum fds { FD_X,
+		   FD_INFO,
+		   FD_ARL,
+		   FD_CNT };
 	struct pollfd pfd[FD_CNT];
 	int timeout = 0;
-	const struct timespec ten_ms = {0, 10000000};
+	const struct timespec ten_ms = { 0, 10000000 };
 	bool discard, init_thumb, load_thumb, to_set;
 	XEvent ev, nextev;
 
@@ -774,7 +782,7 @@ static void run(void)
 				on_buttonpress(&ev.xbutton);
 				break;
 			case ClientMessage:
-				if ((Atom) ev.xclient.data.l[0] == atoms[ATOM_WM_DELETE_WINDOW])
+				if ((Atom)ev.xclient.data.l[0] == atoms[ATOM_WM_DELETE_WINDOW])
 					cg_quit(EXIT_SUCCESS);
 				break;
 			case DestroyNotify:
@@ -812,12 +820,13 @@ static void run(void)
 
 static int fncmp(const void *a, const void *b)
 {
-	return strcoll(((fileinfo_t*) a)->name, ((fileinfo_t*) b)->name);
+	return strcoll(((fileinfo_t *)a)->name, ((fileinfo_t *)b)->name);
 }
 
 static void sigchld(int sig)
 {
-	while (waitpid(-1, NULL, WNOHANG) > 0);
+	while (waitpid(-1, NULL, WNOHANG) > 0)
+		;
 }
 
 static void setup_signal(int sig, void (*handler)(int sig))
@@ -891,7 +900,7 @@ int main(int argc, char *argv[])
 			start = fileidx;
 			while ((filename = r_readdir(&dir, true)) != NULL) {
 				check_add_file(filename, false);
-				free((void*) filename);
+				free((void *)filename);
 			}
 			r_closedir(&dir);
 			if (fileidx - start > 1)

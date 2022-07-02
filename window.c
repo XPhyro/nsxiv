@@ -53,8 +53,12 @@ static struct {
 	int name;
 	Cursor icon;
 } cursors[CURSOR_COUNT] = {
-	{ XC_left_ptr }, { XC_dotbox }, { XC_fleur }, { XC_watch },
-	{ XC_sb_left_arrow }, { XC_sb_right_arrow }
+	{ XC_left_ptr },
+	{ XC_dotbox },
+	{ XC_fleur },
+	{ XC_watch },
+	{ XC_sb_left_arrow },
+	{ XC_sb_right_arrow }
 };
 
 static GC gc;
@@ -88,7 +92,7 @@ static void win_alloc_color(const win_env_t *e, const char *name, XColor *col)
 		error(EXIT_FAILURE, 0, "Error allocating color '%s'", name);
 }
 
-static const char* win_res(XrmDatabase db, const char *name, const char *def)
+static const char *win_res(XrmDatabase db, const char *name, const char *def)
 {
 	char *type;
 	XrmValue ret;
@@ -137,7 +141,7 @@ void win_init(win_t *win)
 
 	win_bg = win_res(db, RES_CLASS ".window.background", DEFAULT_WIN_BG);
 	win_fg = win_res(db, RES_CLASS ".window.foreground", DEFAULT_WIN_FG);
-	mrk_fg = win_res(db, RES_CLASS ".mark.foreground",   DEFAULT_MARK_COLOR ? DEFAULT_MARK_COLOR : win_fg);
+	mrk_fg = win_res(db, RES_CLASS ".mark.foreground", DEFAULT_MARK_COLOR ? DEFAULT_MARK_COLOR : win_fg);
 	win_alloc_color(e, win_bg, &win->win_bg);
 	win_alloc_color(e, win_fg, &win->win_fg);
 	win_alloc_color(e, mrk_fg, &win->mrk_fg);
@@ -226,7 +230,8 @@ void win_open(win_t *win)
 		if (gmask & YNegative) {
 			win->y += e->scrh - win->h;
 			sizehints.win_gravity = sizehints.win_gravity == NorthEastGravity ?
-			                        SouthEastGravity : SouthWestGravity;
+			                                SouthEastGravity :
+                                                        SouthWestGravity;
 		}
 		sizehints.flags |= USPosition;
 	} else {
@@ -245,7 +250,7 @@ void win_open(win_t *win)
 	/* set the _NET_WM_PID */
 	pid = getpid();
 	XChangeProperty(e->dpy, win->xwin, atoms[ATOM__NET_WM_PID], XA_CARDINAL,
-	                32, PropModeReplace, (unsigned char *) &pid, 1);
+	                32, PropModeReplace, (unsigned char *)&pid, 1);
 	if (gethostname(hostname, ARRLEN(hostname)) == 0) {
 		XTextProperty tp;
 		tp.value = (unsigned char *)hostname;
@@ -257,7 +262,7 @@ void win_open(win_t *win)
 
 	XSelectInput(e->dpy, win->xwin,
 	             ButtonReleaseMask | ButtonPressMask | KeyPressMask |
-	             PointerMotionMask | StructureNotifyMask);
+	                     PointerMotionMask | StructureNotifyMask);
 
 	for (i = 0; i < ARRLEN(cursors); i++) {
 		if (i != CURSOR_NONE)
@@ -271,7 +276,7 @@ void win_open(win_t *win)
 
 	gc = XCreateGC(e->dpy, win->xwin, 0, None);
 
-	n = icons[ARRLEN(icons)-1].size;
+	n = icons[ARRLEN(icons) - 1].size;
 	icon_data = emalloc((n * n + 2) * sizeof(*icon_data));
 
 	for (i = 0; i < ARRLEN(icons); i++) {
@@ -285,7 +290,7 @@ void win_open(win_t *win)
 		}
 		XChangeProperty(e->dpy, win->xwin, atoms[ATOM__NET_WM_ICON], XA_CARDINAL, 32,
 		                i == 0 ? PropModeReplace : PropModeAppend,
-		                (unsigned char *) icon_data, n);
+		                (unsigned char *)icon_data, n);
 	}
 	free(icon_data);
 
@@ -310,7 +315,7 @@ void win_open(win_t *win)
 	if (options->fullscreen) {
 		XChangeProperty(e->dpy, win->xwin, atoms[ATOM__NET_WM_STATE],
 		                XA_ATOM, 32, PropModeReplace,
-		                (unsigned char *) &atoms[ATOM__NET_WM_STATE_FULLSCREEN], 1);
+		                (unsigned char *)&atoms[ATOM__NET_WM_STATE_FULLSCREEN], 1);
 	}
 
 	win->h -= win->bar.h;
@@ -426,10 +431,10 @@ static int win_draw_text(win_t *win, XftDraw *d, const XftColor *color,
 			                FC_SIZE, FcTypeDouble, fontsize, NULL);
 			FcCharSetDestroy(fccharset);
 		}
-		XftTextExtentsUtf8(win->env.dpy, f, (XftChar8*)t, next - t, &ext);
+		XftTextExtentsUtf8(win->env.dpy, f, (XftChar8 *)t, next - t, &ext);
 		tw += ext.xOff;
 		if (tw <= w) {
-			XftDrawStringUtf8(d, color, f, x, y, (XftChar8*)t, next - t);
+			XftDrawStringUtf8(d, color, f, x, y, (XftChar8 *)t, next - t);
 			x += ext.xOff;
 		}
 		if (f != font)
@@ -450,7 +455,7 @@ static void win_draw_bar(win_t *win)
 
 	e = &win->env;
 	y = (win->bar.top ? 0 : win->h) + font->ascent + V_TEXT_PAD;
-	w = win->w - 2*H_TEXT_PAD;
+	w = win->w - 2 * H_TEXT_PAD;
 	d = XftDrawCreate(e->dpy, win->buf.pm, e->vis, e->cmap);
 
 	XSetForeground(e->dpy, gc, win->bar_bg.pixel);
@@ -476,7 +481,7 @@ static void win_draw_bar(win_t *win)
 #else
 static void win_draw_bar(win_t *win)
 {
-	(void) win;
+	(void)win;
 }
 #endif /* HAVE_LIBFONTS */
 

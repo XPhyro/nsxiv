@@ -37,14 +37,13 @@ void print_usage(void)
 static void title_deprecation_notice(void)
 {
 	error(EXIT_FAILURE, 0, "\n"
-	      "################################################################\n"
-	      "#                      DEPRECATION NOTICE                      #\n"
-	      "################################################################\n"
-	      "# `-T` option has been deprecated in favour of `win-title`.    #\n"
-	      "# Please read the `WINDOW TITLE` section of the manpage for    #\n"
-	      "# more info.                                                   #\n"
-	      "################################################################"
-	);
+	                       "################################################################\n"
+	                       "#                      DEPRECATION NOTICE                      #\n"
+	                       "################################################################\n"
+	                       "# `-T` option has been deprecated in favour of `win-title`.    #\n"
+	                       "# Please read the `WINDOW TITLE` section of the manpage for    #\n"
+	                       "# more info.                                                   #\n"
+	                       "################################################################");
 }
 
 static void print_version(void)
@@ -182,7 +181,7 @@ void parse_options(int argc, char **argv)
 				if (*end != '\0' || n <= 0)
 					error(EXIT_FAILURE, 0, "Invalid argument for option -z: %s", optarg);
 				_options.scalemode = SCALE_ZOOM;
-				_options.zoom = (float) n / 100.0;
+				_options.zoom = (float)n / 100.0;
 				break;
 			case '0':
 				_options.using_null = true;
