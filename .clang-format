@@ -1,5 +1,9 @@
 ---
 
+# clang-format isn't authoritative for the style decisions in this project, but
+# these rules mostly align with the suggested style, and clang-format can be
+# used to fix any potential style mistakes.
+
 Standard: c++03
 
 ColumnLimit: 0
