@@ -99,6 +99,7 @@ void parse_options(int argc, char **argv)
 	};
 
 	long n, opt;
+	float f;
 	char *end, *s;
 	struct optparse op;
 	const char scalemodes[] = "dfFwh"; /* must be sorted according to scalemode_t */
@@ -207,10 +208,10 @@ void parse_options(int argc, char **argv)
 			_options.recursive = true;
 			break;
 		case 'S':
-			n = strtof(op.optarg, &end) * 10;
-			if (*end != '\0' || n <= 0 || n > INT_MAX)
+			f = strtof(op.optarg, &end) * 10.0f;
+			if (*end != '\0' || f <= 0 || f > UINT_MAX)
 				error(EXIT_FAILURE, 0, "Invalid argument for option -S: %s", op.optarg);
-			_options.slideshow = n;
+			_options.slideshow = f;
 			break;
 		case 's':
 			s = strchr(scalemodes, op.optarg[0]);
