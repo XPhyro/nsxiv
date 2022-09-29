@@ -610,25 +610,18 @@ bool img_load(img_t *img, const fileinfo_t *file)
 CLEANUP void img_close(img_t *img, bool decache)
 {
 	unsigned int i;
+	void (*free_img)(void) = decache ? imlib_free_image_and_decache : imlib_free_image;
 
 	if (img->multi.cnt > 0) {
 		for (i = 0; i < img->multi.cnt; i++) {
 			imlib_context_set_image(img->multi.frames[i].im);
-#if HAVE_IMLIB2_MULTI_FRAME
-			if (decache)
-				imlib_free_image_and_decache();
-			else
-#endif
-			imlib_free_image();
+			free_img();
 		}
 		img->multi.cnt = 0;
 		img->im = NULL;
 	} else if (img->im != NULL) {
 		imlib_context_set_image(img->im);
-		if (decache)
-			imlib_free_image_and_decache();
-		else
-			imlib_free_image();
+		free_img();
 		img->im = NULL;
 	}
 }
