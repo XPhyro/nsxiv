@@ -14,11 +14,12 @@ HAVE_INOTIFY = $(OPT_DEP_DEFAULT)
 
 # optional dependencies, see README for more info
 HAVE_LIBFONTS = $(OPT_DEP_DEFAULT)
-HAVE_LIBGIF   = $(OPT_DEP_DEFAULT)
 HAVE_LIBEXIF  = $(OPT_DEP_DEFAULT)
+
+# unused if imlib2 version is 1.8.0 or higher.
+# these options will be removed eventually.
+HAVE_LIBGIF   = $(OPT_DEP_DEFAULT)
 HAVE_LIBWEBP  = $(OPT_DEP_DEFAULT)
-# TODO: switch to $(OPT_DEP_DEFAULT) before merging to master
-HAVE_IMLIB2_MULTI_FRAME = 1
 
 # Compiler and linker
 CC = c99

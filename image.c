@@ -33,6 +33,15 @@
 #include <libexif/exif-data.h>
 #endif
 
+#ifdef IMLIB2_VERSION
+	#if IMLIB2_VERSION >= IMLIB2_VERSION_(1, 8, 0)
+		#define HAVE_IMLIB2_MULTI_FRAME 1
+	#endif
+#endif
+#ifndef HAVE_IMLIB2_MULTI_FRAME
+	#define HAVE_IMLIB2_MULTI_FRAME 0
+#endif
+
 #if HAVE_LIBGIF && !HAVE_IMLIB2_MULTI_FRAME
 #include <gif_lib.h>
 enum { DEF_GIF_DELAY = 75 };
@@ -157,10 +166,6 @@ static void img_multiframe_context_set(img_t *img)
 #if (HAVE_LIBGIF || HAVE_LIBWEBP) && !HAVE_IMLIB2_MULTI_FRAME
 static void img_multiframe_deprecation_notice(void)
 {
-/* NOTE: enable the deprecation notice, and update imlib2 version below
- *       once the imlib2 multi-frame loading performance is resolved.
- */
-#if 0
 	static bool warned;
 	if (!warned) {
 		error(0, 0, "\n"
@@ -168,14 +173,12 @@ static void img_multiframe_deprecation_notice(void)
 		      "#                      DEPRECATION NOTICE                      #\n"
 		      "################################################################\n"
 		      "# Internal multi-frame gif and webp loaders are deprecated and #\n"
-		      "# will be removed soon. Please upgrade to Imlib2 vX.X.X for    #\n"
+		      "# will be removed soon. Please upgrade to Imlib2 v1.8.0 for    #\n"
 		      "# multi-frame/animated image support. For more information,    #\n"
-		      "# visit: https://github.com/nsxiv/nsxiv/issues/193             #\n"
-		      "################################################################"
-		      );
+		      "# visit: https://codeberg.org/nsxiv/nsxiv/issues/301           #\n"
+		      "################################################################");
 		warned = true;
 	}
-#endif
 }
 #endif
 
@@ -485,10 +488,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		int sx, sy, sw, sh;
 		bool err = true;
 
-		/* TODO: loading performance is currently pretty bad.
-		 * seems to be due to IO. i assume imlib_load_image_frame() doesn't
-		 * cache the file and is making a read everytime.
-		 */
 		if ((im = imlib_load_image_frame(file->path, n)) == NULL)
 			goto loop_cleanup;
 		imlib_context_set_image(im);
