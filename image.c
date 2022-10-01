@@ -453,15 +453,15 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	Imlib_Image im, canvas;
 	Imlib_Frame_Info finfo;
 	bool dispose, has_alpha;
-	int px, py, pw, ph;
+	int cw, ch, px, py, pw, ph;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
 	if ((fcnt = finfo.frame_count) <= 1)
 		return false;
 	has_alpha = imlib_image_has_alpha();
-	img->w = finfo.canvas_w;
-	img->h = finfo.canvas_h;
+	cw = finfo.canvas_w;
+	ch = finfo.canvas_h;
 
 	if (fcnt > img->multi.cap) {
 		img->multi.cap = fcnt;
@@ -473,12 +473,12 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_anti_alias(0);
 	imlib_context_set_color_modifier(NULL);
 
-	if ((canvas = imlib_create_image(img->w, img->h)) == NULL) {
+	if ((canvas = imlib_create_image(cw, ch)) == NULL) {
 		error(0, 0, "%s: couldn't create image", file->name);
-		return true;
+		return false;
 	}
 	imlib_context_set_image(canvas);
-	img_area_clear(0, 0, img->w, img->h);
+	img_area_clear(0, 0, cw, ch);
 
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
@@ -535,8 +535,9 @@ loop_cleanup:
 	imlib_context_set_image(canvas);
 	imlib_free_image();
 	img_multiframe_context_set(img);
-
-	return true;
+	img->w = cw;
+	img->h = ch;
+	return img->multi.cnt > 0;
 }
 #endif /* HAVE_IMLIB2_MULTI_FRAME */
 
