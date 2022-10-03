@@ -448,9 +448,8 @@ static void img_area_clear(int x, int y, int w, int h)
 
 static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
-	unsigned int n;
-	unsigned int fcnt;
-	Imlib_Image canvas;
+	unsigned int n, fcnt;
+	Imlib_Image blank;
 	Imlib_Frame_Info finfo;
 	bool dispose, has_alpha;
 	int cw, ch, px, py, pw, ph;
@@ -473,33 +472,33 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_anti_alias(0);
 	imlib_context_set_color_modifier(NULL);
 
-	if ((canvas = imlib_create_image(cw, ch)) == NULL) {
+	if ((blank = imlib_create_image(cw, ch)) == NULL) {
 		error(0, 0, "%s: couldn't create image", file->name);
 		return false;
 	}
-	imlib_context_set_image(canvas);
+	imlib_context_set_image(blank);
 	img_area_clear(0, 0, cw, ch);
 
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
-		Imlib_Image im, tmp;
-		Imlib_Image prev = n == 1 ? canvas : img->multi.frames[img->multi.cnt - 1].im;
+		Imlib_Image frame, canvas;
+		Imlib_Image prev = n == 1 ? blank : img->multi.frames[img->multi.cnt - 1].im;
 		int sx, sy, sw, sh;
 
 		imlib_context_set_image(prev);
-		if ((tmp = imlib_clone_image()) == NULL ||
-		    (im = imlib_load_image_frame(file->path, n)) == NULL)
+		if ((canvas = imlib_clone_image()) == NULL ||
+		    (frame = imlib_load_image_frame(file->path, n)) == NULL)
 		{
-			if (tmp != NULL) {
-				imlib_context_set_image(tmp);
+			if (canvas != NULL) {
+				imlib_context_set_image(canvas);
 				imlib_free_image();
 			}
 			error(0, 0, "%s: failed to load frame %d", file->name, n);
 			break;
 		}
 
-		imlib_context_set_image(im);
+		imlib_context_set_image(frame);
 		imlib_image_get_frame_info(&finfo);
 		sx = finfo.frame_x;
 		sy = finfo.frame_y;
@@ -507,14 +506,14 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		sh = finfo.frame_h;
 
 		/* blend on top of the previous image */
-		imlib_context_set_image(tmp);
+		imlib_context_set_image(canvas);
 		if (dispose)
 			img_area_clear(px, py, pw, ph);
 		imlib_image_set_has_alpha(has_alpha);
 		/* FIXME: bg of apng images are set to black instead of being transparent */
 		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
-		imlib_blend_image_onto_image(im, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
-		img->multi.frames[img->multi.cnt].im = tmp;
+		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
+		img->multi.frames[img->multi.cnt].im = canvas;
 
 		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
 		if (dispose) { /* remember these so we can "dispose" them before blending next frame */
@@ -526,10 +525,10 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
-		imlib_context_set_image(im);
+		imlib_context_set_image(frame);
 		imlib_free_image();
 	}
-	imlib_context_set_image(canvas);
+	imlib_context_set_image(blank);
 	imlib_free_image();
 	img_multiframe_context_set(img);
 	img->w = cw;
