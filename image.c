@@ -452,15 +452,15 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	Imlib_Image blank;
 	Imlib_Frame_Info finfo;
 	bool dispose, has_alpha;
-	int cw, ch, px, py, pw, ph;
+	int px, py, pw, ph;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
 	if ((fcnt = finfo.frame_count) <= 1)
 		return false;
 	has_alpha = imlib_image_has_alpha();
-	cw = finfo.canvas_w;
-	ch = finfo.canvas_h;
+	img->w = finfo.canvas_w;
+	img->h = finfo.canvas_h;
 
 	if (fcnt > img->multi.cap) {
 		img->multi.cap = fcnt;
@@ -472,12 +472,12 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_anti_alias(0);
 	imlib_context_set_color_modifier(NULL);
 
-	if ((blank = imlib_create_image(cw, ch)) == NULL) {
+	if ((blank = imlib_create_image(img->w, img->h)) == NULL) {
 		error(0, 0, "%s: couldn't create image", file->name);
 		return false;
 	}
 	imlib_context_set_image(blank);
-	img_area_clear(0, 0, cw, ch);
+	img_area_clear(0, 0, img->w, img->h);
 
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
@@ -500,6 +500,8 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 		imlib_context_set_image(frame);
 		imlib_image_get_frame_info(&finfo);
+		assert(finfo.frame_count == (int)fcnt);
+		assert(finfo.canvas_w == img->w && finfo.canvas_h == img->h);
 		sx = finfo.frame_x;
 		sy = finfo.frame_y;
 		sw = finfo.frame_w;
@@ -509,12 +511,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		imlib_context_set_image(canvas);
 		if (dispose)
 			img_area_clear(px, py, pw, ph);
-		imlib_image_set_has_alpha(has_alpha);
-		/* FIXME: bg of apng images are set to black instead of being transparent */
-		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
-		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
-		img->multi.frames[img->multi.cnt].im = canvas;
-
 		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
 		if (dispose) { /* remember these so we can "dispose" them before blending next frame */
 			px = sx;
@@ -522,6 +518,12 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 			pw = sw;
 			ph = sh;
 		}
+
+		imlib_image_set_has_alpha(has_alpha);
+		/* FIXME: bg of apng images are set to black instead of being transparent */
+		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
+		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
+		img->multi.frames[img->multi.cnt].im = canvas;
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
@@ -531,8 +533,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_image(blank);
 	imlib_free_image();
 	img_multiframe_context_set(img);
-	img->w = cw;
-	img->h = ch;
 	return img->multi.cnt > 0;
 }
 #endif /* HAVE_IMLIB2_MULTI_FRAME */
