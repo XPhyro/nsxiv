@@ -450,7 +450,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 {
 	unsigned int n;
 	unsigned int fcnt;
-	Imlib_Image im, canvas;
+	Imlib_Image canvas;
 	Imlib_Frame_Info finfo;
 	bool dispose, has_alpha;
 	int cw, ch, px, py, pw, ph;
@@ -483,13 +483,22 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	dispose = false;
 	img->multi.cnt = img->multi.sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
-		Imlib_Image tmp;
+		Imlib_Image im, tmp;
 		Imlib_Image prev = n == 1 ? canvas : img->multi.frames[img->multi.cnt - 1].im;
 		int sx, sy, sw, sh;
-		bool err = true;
 
-		if ((im = imlib_load_image_frame(file->path, n)) == NULL)
-			goto loop_cleanup;
+		imlib_context_set_image(prev);
+		if ((tmp = imlib_clone_image()) == NULL ||
+		    (im = imlib_load_image_frame(file->path, n)) == NULL)
+		{
+			if (tmp != NULL) {
+				imlib_context_set_image(tmp);
+				imlib_free_image();
+			}
+			error(0, 0, "%s: failed to load frame %d", file->name, n);
+			break;
+		}
+
 		imlib_context_set_image(im);
 		imlib_image_get_frame_info(&finfo);
 		sx = finfo.frame_x;
@@ -498,9 +507,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		sh = finfo.frame_h;
 
 		/* blend on top of the previous image */
-		imlib_context_set_image(prev);
-		if ((tmp = imlib_clone_image()) == NULL)
-			goto loop_cleanup;
 		imlib_context_set_image(tmp);
 		if (dispose)
 			img_area_clear(px, py, pw, ph);
@@ -520,17 +526,8 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
 		img->multi.length += img->multi.frames[img->multi.cnt].delay;
 		img->multi.cnt++;
-
-		err = false;
-loop_cleanup:
-		if (im != NULL) {
-			imlib_context_set_image(im);
-			imlib_free_image();
-		}
-		if (err) {
-			error(0, 0, "%s: error loading frame %d", file->name, n);
-			break;
-		}
+		imlib_context_set_image(im);
+		imlib_free_image();
 	}
 	imlib_context_set_image(canvas);
 	imlib_free_image();
