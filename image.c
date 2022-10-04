@@ -451,14 +451,13 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	unsigned int n, fcnt;
 	Imlib_Image blank;
 	Imlib_Frame_Info finfo;
-	bool dispose, has_alpha;
+	bool dispose;
 	int px, py, pw, ph;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
 	if ((fcnt = finfo.frame_count) <= 1)
 		return false;
-	has_alpha = imlib_image_has_alpha();
 	img->w = finfo.canvas_w;
 	img->h = finfo.canvas_h;
 
@@ -484,7 +483,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
 		Imlib_Image prev = n == 1 ? blank : img->multi.frames[img->multi.cnt - 1].im;
-		int sx, sy, sw, sh;
+		int sx, sy, sw, sh, has_alpha;
 
 		imlib_context_set_image(prev);
 		if ((canvas = imlib_clone_image()) == NULL ||
@@ -506,6 +505,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		sy = finfo.frame_y;
 		sw = finfo.frame_w;
 		sh = finfo.frame_h;
+		has_alpha = imlib_image_has_alpha();
 
 		/* blend on top of the previous image */
 		imlib_context_set_image(canvas);
@@ -518,7 +518,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 			pw = sw;
 			ph = sh;
 		}
-
 		imlib_image_set_has_alpha(has_alpha);
 		/* FIXME: bg of apng images are set to black instead of being transparent */
 		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
