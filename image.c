@@ -453,6 +453,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	Imlib_Frame_Info finfo;
 	bool dispose;
 	int px, py, pw, ph;
+	multi_img_t *m = &img->multi;
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
@@ -461,10 +462,9 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	img->w = finfo.canvas_w;
 	img->h = finfo.canvas_h;
 
-	if (fcnt > img->multi.cap) {
-		img->multi.cap = fcnt;
-		img->multi.frames = erealloc(img->multi.frames,
-		                             img->multi.cap * sizeof(img_frame_t));
+	if (fcnt > m->cap) {
+		m->cap = fcnt;
+		m->frames = erealloc(m->frames, m->cap * sizeof(img_frame_t));
 	}
 
 	imlib_context_set_dither(0);
@@ -479,10 +479,10 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	img_area_clear(0, 0, img->w, img->h);
 
 	dispose = false;
-	img->multi.cnt = img->multi.sel = 0;
+	m->cnt = m->sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
-		Imlib_Image prev = n == 1 ? blank : img->multi.frames[img->multi.cnt - 1].im;
+		Imlib_Image prev = n == 1 ? blank : m->frames[m->cnt - 1].im;
 		int sx, sy, sw, sh, has_alpha;
 
 		imlib_context_set_image(prev);
@@ -522,17 +522,17 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 		/* FIXME: bg of apng images are set to black instead of being transparent */
 		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
 		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
-		img->multi.frames[img->multi.cnt].im = canvas;
-		img->multi.frames[img->multi.cnt].delay = finfo.frame_delay;
-		img->multi.length += img->multi.frames[img->multi.cnt].delay;
-		img->multi.cnt++;
+		m->frames[m->cnt].im = canvas;
+		m->frames[m->cnt].delay = finfo.frame_delay;
+		m->length += m->frames[m->cnt].delay;
+		m->cnt++;
 		imlib_context_set_image(frame);
 		imlib_free_image();
 	}
 	imlib_context_set_image(blank);
 	imlib_free_image();
 	img_multiframe_context_set(img);
-	return img->multi.cnt > 0;
+	return m->cnt > 0;
 }
 #endif /* HAVE_IMLIB2_MULTI_FRAME */
 
