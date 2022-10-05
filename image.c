@@ -174,8 +174,7 @@ static void img_multiframe_deprecation_notice(void)
 		      "################################################################\n"
 		      "# Internal multi-frame gif and webp loaders are deprecated and #\n"
 		      "# will be removed soon. Please upgrade to Imlib2 v1.8.0 for    #\n"
-		      "# multi-frame/animated image support. For more information,    #\n"
-		      "# visit: https://codeberg.org/nsxiv/nsxiv/issues/301           #\n"
+		      "# multi-frame/animated image support.                          #\n"
 		      "################################################################");
 		warned = true;
 	}
