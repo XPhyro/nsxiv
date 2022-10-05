@@ -519,7 +519,6 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 			ph = sh;
 		}
 		imlib_image_set_has_alpha(has_alpha);
-		/* FIXME: bg of apng images are set to black instead of being transparent */
 		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
 		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
 		m->frames[m->cnt].im = canvas;
