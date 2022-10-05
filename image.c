@@ -450,8 +450,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	unsigned int n, fcnt;
 	Imlib_Image blank;
 	Imlib_Frame_Info finfo;
-	bool dispose;
-	int px, py, pw, ph;
+	int px, py, pw, ph, pflag;
 	multi_img_t *m = &img->multi;
 
 	imlib_context_set_image(img->im);
@@ -479,14 +478,12 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_image(blank);
 	img_area_clear(0, 0, img->w, img->h);
 
-	dispose = false;
-	m->cnt = m->sel = 0;
+	pflag = m->cnt = m->sel = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
-		Imlib_Image prev = n == 1 ? blank : m->frames[m->cnt - 1].im;
 		int sx, sy, sw, sh, has_alpha;
 
-		imlib_context_set_image(prev);
+		imlib_context_set_image(m->cnt < 1 ? blank : m->frames[m->cnt - 1].im);
 		if ((canvas = imlib_clone_image()) == NULL ||
 		    (frame = imlib_load_image_frame(file->path, n)) == NULL)
 		{
@@ -510,10 +507,11 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 		/* blend on top of the previous image */
 		imlib_context_set_image(canvas);
-		if (dispose)
+		if (pflag & IMLIB_FRAME_DISPOSE_CLEAR)
 			img_area_clear(px, py, pw, ph);
-		dispose = finfo.frame_flags & IMLIB_FRAME_DISPOSE_CLEAR;
-		if (dispose) { /* remember these so we can "dispose" them before blending next frame */
+		pflag = finfo.frame_flags;
+		if (pflag & IMLIB_FRAME_DISPOSE_CLEAR) {
+			/* remember these so we can "dispose" them before blending next frame */
 			px = sx;
 			py = sy;
 			pw = sw;
