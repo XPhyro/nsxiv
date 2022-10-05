@@ -470,6 +470,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_dither(0);
 	imlib_context_set_anti_alias(0);
 	imlib_context_set_color_modifier(NULL);
+	imlib_context_set_operation(IMLIB_OP_COPY);
 
 	if ((blank = imlib_create_image(img->w, img->h)) == NULL) {
 		error(0, 0, "%s: couldn't create image", file->name);
@@ -518,6 +519,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 			pw = sw;
 			ph = sh;
 		}
+		assert(imlib_context_get_operation() == IMLIB_OP_COPY);
 		imlib_image_set_has_alpha(has_alpha);
 		imlib_context_set_blend(!!(finfo.frame_flags & IMLIB_FRAME_BLEND));
 		imlib_blend_image_onto_image(frame, has_alpha, 0, 0, sw, sh, sx, sy, sw, sh);
