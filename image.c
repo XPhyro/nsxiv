@@ -457,7 +457,8 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 	imlib_context_set_image(img->im);
 	imlib_image_get_frame_info(&finfo);
-	if ((fcnt = finfo.frame_count) <= 1)
+	/* TODO: handle cases where an image is multi-frame but not animated */
+	if ((fcnt = finfo.frame_count) <= 1 || !(finfo.frame_flags & IMLIB_IMAGE_ANIMATED))
 		return false;
 	img->w = finfo.canvas_w;
 	img->h = finfo.canvas_h;
