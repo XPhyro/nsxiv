@@ -463,7 +463,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 	if (fcnt > m->cap) {
 		m->cap = fcnt;
-		m->frames = erealloc(m->frames, m->cap * sizeof(img_frame_t));
+		m->frames = erealloc(m->frames, m->cap * sizeof(*m->frames));
 	}
 
 	imlib_context_set_dither(0);
