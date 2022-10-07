@@ -439,6 +439,8 @@ fail:
 #if HAVE_IMLIB2_MULTI_FRAME
 static void img_area_clear(int x, int y, int w, int h)
 {
+	assert(x >= 0 && y >= 0);
+	assert(w > 0 && h > 0);
 	imlib_image_set_has_alpha(1);
 	imlib_context_set_blend(0);
 	imlib_context_set_color(0, 0, 0, 0);
@@ -479,6 +481,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	img_area_clear(0, 0, img->w, img->h);
 
 	pflag = m->cnt = m->sel = 0;
+	px = py = pw = ph = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
 		int sx, sy, sw, sh, has_alpha;
