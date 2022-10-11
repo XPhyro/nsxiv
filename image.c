@@ -510,10 +510,16 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 
 		/* blend on top of the previous image */
 		imlib_context_set_image(canvas);
-		if (pflag & IMLIB_FRAME_DISPOSE_CLEAR)
-			img_area_clear(px, py, pw, ph);
-		pflag = finfo.frame_flags;
 		if (pflag & IMLIB_FRAME_DISPOSE_CLEAR) {
+			img_area_clear(px, py, pw, ph);
+		} else if (pflag & IMLIB_FRAME_DISPOSE_PREV) {
+			Imlib_Image p = m->cnt < 2 ? blank : m->frames[m->cnt - 2].im;
+			assert(m->cnt > 0);
+			img_area_clear(0, 0, img->w, img->h);
+			imlib_blend_image_onto_image(p, 1, px, py, pw, ph, px, py, pw, ph);
+		}
+		pflag = finfo.frame_flags;
+		if (pflag & (IMLIB_FRAME_DISPOSE_CLEAR | IMLIB_FRAME_DISPOSE_PREV)) {
 			/* remember these so we can "dispose" them before blending next frame */
 			px = sx;
 			py = sy;
