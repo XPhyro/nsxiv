@@ -480,7 +480,7 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	imlib_context_set_image(blank);
 	img_area_clear(0, 0, img->w, img->h);
 
-	pflag = m->cnt = m->sel = 0;
+	pflag = m->length = m->cnt = m->sel = 0;
 	px = py = pw = ph = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
