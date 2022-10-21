@@ -483,7 +483,8 @@ static bool img_load_multiframe(img_t *img, const fileinfo_t *file)
 	px = py = pw = ph = 0;
 	for (n = 1; n <= fcnt; ++n) {
 		Imlib_Image frame, canvas;
-		int sx, sy, sw, sh, has_alpha;
+		int sx, sy, sw, sh;
+		bool has_alpha;
 
 		imlib_context_set_image(m->cnt < 1 ? blank : m->frames[m->cnt - 1].im);
 		if ((canvas = imlib_clone_image()) == NULL ||
