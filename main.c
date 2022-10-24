@@ -123,7 +123,7 @@ static bool xgetline(char **lineptr, size_t *n)
 
 static int fncmp(const void *a, const void *b)
 {
-	return strcoll(((fileinfo_t*) a)->name, ((fileinfo_t*) b)->name);
+	return strcoll(((fileinfo_t *)a)->name, ((fileinfo_t *)b)->name);
 }
 
 static void check_add_file(const char *filename, bool given)
