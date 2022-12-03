@@ -26,7 +26,6 @@ bool ci_cursor_navigate(arg_t);
 bool ci_drag(arg_t);
 bool ci_fit_to_win(arg_t);
 bool ci_flip(arg_t);
-bool ci_invert_colors(arg_t);
 bool ci_navigate(arg_t);
 bool ci_navigate_frame(arg_t);
 bool ci_rotate(arg_t);
@@ -38,6 +37,7 @@ bool ci_slideshow(arg_t);
 bool ci_toggle_alpha(arg_t);
 bool ci_toggle_animation(arg_t);
 bool ci_toggle_antialias(arg_t);
+bool ci_toggle_invert(arg_t);
 /* thumbnails mode */
 bool ct_move_sel(arg_t);
 bool ct_reload_all(arg_t);
@@ -71,7 +71,6 @@ bool ct_select(arg_t);
 #define i_drag { ci_drag, MODE_IMAGE }
 #define i_fit_to_win { ci_fit_to_win, MODE_IMAGE }
 #define i_flip { ci_flip, MODE_IMAGE }
-#define i_invert_colors { ci_invert_colors, MODE_IMAGE }
 #define i_navigate { ci_navigate, MODE_IMAGE }
 #define i_navigate_frame { ci_navigate_frame, MODE_IMAGE }
 #define i_rotate { ci_rotate, MODE_IMAGE }
@@ -83,6 +82,7 @@ bool ct_select(arg_t);
 #define i_toggle_alpha { ci_toggle_alpha, MODE_IMAGE }
 #define i_toggle_animation { ci_toggle_animation, MODE_IMAGE }
 #define i_toggle_antialias { ci_toggle_antialias, MODE_IMAGE }
+#define i_toggle_invert { ci_toggle_invert, MODE_IMAGE }
 
 /* thumbnails mode */
 #define t_move_sel { ct_move_sel, MODE_THUMB }
