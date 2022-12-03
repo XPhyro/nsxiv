@@ -377,7 +377,7 @@ bool ci_toggle_alpha(arg_t _)
 	return true;
 }
 
-bool ci_invert_colors(arg_t _)
+bool ci_toggle_invert(arg_t _)
 {
 	img.should_be_inverted = !img.should_be_inverted;
 	img.dirty = true;
