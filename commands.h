@@ -66,7 +66,7 @@ bool ct_select(arg_t);
 #define g_zoom { cg_zoom, MODE_ALL }
 
 /* image mode */
-#define i_invert_colors { ci_invert_colors, MODE_ALL }
+#define i_invert_colors { ci_invert_colors, MODE_IMAGE }
 #define i_alternate { ci_alternate, MODE_IMAGE }
 #define i_cursor_navigate { ci_cursor_navigate, MODE_IMAGE }
 #define i_drag { ci_drag, MODE_IMAGE }
