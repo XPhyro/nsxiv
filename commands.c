@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -223,13 +222,6 @@ bool cg_navigate_marked(arg_t n)
 	return navigate_to(new);
 }
 
-bool cg_invert_colors(arg_t _)
-{
-	img.should_be_inverted = !img.should_be_inverted;
-	img.dirty = true;
-	return true;
-}
-
 bool cg_change_gamma(arg_t d)
 {
 	if (img_change_gamma(&img, d * (prefix > 0 ? prefix : 1))) {
@@ -239,6 +231,13 @@ bool cg_change_gamma(arg_t d)
 	} else {
 		return false;
 	}
+}
+
+bool ci_invert_colors(arg_t _)
+{
+	img.should_be_inverted = !img.should_be_inverted;
+	img.dirty = true;
+	return true;
 }
 
 bool ci_navigate(arg_t n)

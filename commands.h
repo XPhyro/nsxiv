@@ -4,7 +4,6 @@
 
 /* global */
 bool cg_change_gamma(arg_t);
-bool cg_invert_colors(arg_t);
 bool cg_first(arg_t);
 bool cg_mark_range(arg_t);
 bool cg_n_or_last(arg_t);
@@ -22,6 +21,7 @@ bool cg_toggle_image_mark(arg_t);
 bool cg_unmark_all(arg_t);
 bool cg_zoom(arg_t);
 /* image mode */
+bool ci_invert_colors(arg_t);
 bool ci_alternate(arg_t);
 bool ci_cursor_navigate(arg_t);
 bool ci_drag(arg_t);
@@ -48,7 +48,6 @@ bool ct_select(arg_t);
 #ifdef INCLUDE_MAPPINGS_CONFIG
 /* global */
 #define g_change_gamma { cg_change_gamma, MODE_ALL }
-#define g_invert_colors { cg_invert_colors, MODE_ALL }
 #define g_first { cg_first, MODE_ALL }
 #define g_mark_range { cg_mark_range, MODE_ALL }
 #define g_n_or_last { cg_n_or_last, MODE_ALL }
@@ -67,6 +66,7 @@ bool ct_select(arg_t);
 #define g_zoom { cg_zoom, MODE_ALL }
 
 /* image mode */
+#define i_invert_colors { ci_invert_colors, MODE_ALL }
 #define i_alternate { ci_alternate, MODE_IMAGE }
 #define i_cursor_navigate { ci_cursor_navigate, MODE_IMAGE }
 #define i_drag { ci_drag, MODE_IMAGE }

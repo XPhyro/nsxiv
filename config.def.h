@@ -118,7 +118,6 @@ static const keymap_t keys[] = {
 	{ 0,            XK_braceleft,     g_change_gamma,       -1 },
 	{ 0,            XK_braceright,    g_change_gamma,       +1 },
 	{ ControlMask,  XK_g,             g_change_gamma,        0 },
-	{ 0,            XK_i,             g_invert_colors,      None },
 
 	{ 0,            XK_h,             t_move_sel,           DIR_LEFT },
 	{ 0,            XK_Left,          t_move_sel,           DIR_LEFT },
@@ -130,6 +129,7 @@ static const keymap_t keys[] = {
 	{ 0,            XK_Right,         t_move_sel,           DIR_RIGHT },
 	{ 0,            XK_R,             t_reload_all,         None },
 
+	{ 0,            XK_i,             i_invert_colors,      None },
 	{ 0,            XK_n,             i_navigate,           +1 },
 	{ 0,            XK_n,             i_scroll_to_edge,     DIR_LEFT | DIR_UP },
 	{ 0,            XK_space,         i_navigate,           +1 },
