@@ -189,7 +189,6 @@ struct img {
 	bool dirty;
 	bool anti_alias;
 	bool alpha;
-
 	bool should_be_inverted;
 	bool is_inverted;
 

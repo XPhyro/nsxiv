@@ -18,7 +18,6 @@
  */
 
 #include "nsxiv.h"
-#include <sys/types.h>
 #define INCLUDE_IMAGE_CONFIG
 #include "config.h"
 
@@ -427,7 +426,6 @@ Imlib_Image img_open(const fileinfo_t *file)
 bool img_load(img_t *img, const fileinfo_t *file)
 {
 	const char *fmt;
-	img->is_inverted = false;
 
 	if ((img->im = img_open(file)) == NULL)
 		return false;
@@ -460,6 +458,7 @@ bool img_load(img_t *img, const fileinfo_t *file)
 	img->h = imlib_image_get_height();
 	img->checkpan = true;
 	img->dirty = true;
+	img->is_inverted = false;
 
 	return true;
 }
@@ -599,21 +598,16 @@ void img_render(img_t *img)
 	imlib_context_set_anti_alias(img->anti_alias);
 	imlib_context_set_drawable(win->buf.pm);
 
-	if (img->is_inverted != img->should_be_inverted)
-	{
+	if (img->is_inverted != img->should_be_inverted) {
 		uint32_t i, *data;
+
 		img->is_inverted = img->should_be_inverted;
 		data = imlib_image_get_data();
-		for (i = 0; i < (uint32_t)(img->w * img->h); i++)
-		{
-			uint32_t col, newcol;
-			col = data[i];
-			newcol = (0xFFFFFF - (col & 0x00FFFFFF)) | 0xFF000000;
-			data[i] = newcol;
-		}
+		for (i = 0; i < (uint32_t)img->w * img->h; i++)
+			data[i] = (0xFFFFFF - (data[i] & 0x00FFFFFF)) | 0xFF000000;
 		imlib_image_put_back_data(data);
 	}
-	
+
 	/* manual blending, for performance reasons.
 	 * see https://phab.enlightenment.org/T8969#156167 for more details.
 	 */
@@ -645,7 +639,6 @@ void img_render(img_t *img)
 			imlib_context_set_color(c.red >> 8, c.green >> 8, c.blue >> 8, 0xFF);
 			imlib_image_fill_rectangle(0, 0, dw, dh);
 		}
-
 		imlib_blend_image_onto_image(img->im, 0, sx, sy, sw, sh, 0, 0, dw, dh);
 		imlib_context_set_color_modifier(NULL);
 		imlib_render_image_on_drawable(dx, dy);
