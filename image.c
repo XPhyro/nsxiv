@@ -602,7 +602,8 @@ void img_render(img_t *img)
 	{
 		img->is_inverted = img->should_be_inverted;
 		uint32_t *data = imlib_image_get_data();
-		for (uint32_t i = 0; i < (uint32_t)(img->w * img->h); i++)
+		uint32_t i;
+		for (i = 0; i < (uint32_t)(img->w * img->h); i++)
 		{
 			uint32_t col = data[i];
 			uint32_t newcol = (0xFFFFFF - (col & 0x00FFFFFF)) | 0xFF000000;
