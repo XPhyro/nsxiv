@@ -21,12 +21,12 @@ bool cg_toggle_image_mark(arg_t);
 bool cg_unmark_all(arg_t);
 bool cg_zoom(arg_t);
 /* image mode */
-bool ci_invert_colors(arg_t);
 bool ci_alternate(arg_t);
 bool ci_cursor_navigate(arg_t);
 bool ci_drag(arg_t);
 bool ci_fit_to_win(arg_t);
 bool ci_flip(arg_t);
+bool ci_invert_colors(arg_t);
 bool ci_navigate(arg_t);
 bool ci_navigate_frame(arg_t);
 bool ci_rotate(arg_t);
@@ -66,12 +66,12 @@ bool ct_select(arg_t);
 #define g_zoom { cg_zoom, MODE_ALL }
 
 /* image mode */
-#define i_invert_colors { ci_invert_colors, MODE_IMAGE }
 #define i_alternate { ci_alternate, MODE_IMAGE }
 #define i_cursor_navigate { ci_cursor_navigate, MODE_IMAGE }
 #define i_drag { ci_drag, MODE_IMAGE }
 #define i_fit_to_win { ci_fit_to_win, MODE_IMAGE }
 #define i_flip { ci_flip, MODE_IMAGE }
+#define i_invert_colors { ci_invert_colors, MODE_IMAGE }
 #define i_navigate { ci_navigate, MODE_IMAGE }
 #define i_navigate_frame { ci_navigate_frame, MODE_IMAGE }
 #define i_rotate { ci_rotate, MODE_IMAGE }

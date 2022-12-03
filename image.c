@@ -599,13 +599,13 @@ void img_render(img_t *img)
 	imlib_context_set_drawable(win->buf.pm);
 
 	if (img->is_inverted != img->should_be_inverted) {
-		uint32_t i, *data;
+		size_t i;
+		uint32_t *data = imlib_image_get_data();
 
-		img->is_inverted = img->should_be_inverted;
-		data = imlib_image_get_data();
-		for (i = 0; i < (uint32_t)img->w * img->h; i++)
+		for (i = 0; i < (size_t)img->w * img->h; i++)
 			data[i] = (0xFFFFFF - (data[i] & 0x00FFFFFF)) | 0xFF000000;
 		imlib_image_put_back_data(data);
+		img->is_inverted = img->should_be_inverted;
 	}
 
 	/* manual blending, for performance reasons.

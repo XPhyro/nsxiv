@@ -129,7 +129,6 @@ static const keymap_t keys[] = {
 	{ 0,            XK_Right,         t_move_sel,           DIR_RIGHT },
 	{ 0,            XK_R,             t_reload_all,         None },
 
-	{ 0,            XK_i,             i_invert_colors,      None },
 	{ 0,            XK_n,             i_navigate,           +1 },
 	{ 0,            XK_n,             i_scroll_to_edge,     DIR_LEFT | DIR_UP },
 	{ 0,            XK_space,         i_navigate,           +1 },
@@ -170,6 +169,7 @@ static const keymap_t keys[] = {
 	{ 0,            XK_a,             i_toggle_antialias,   None },
 	{ 0,            XK_A,             i_toggle_alpha,       None },
 	{ 0,            XK_s,             i_slideshow,          None },
+	{ 0,            XK_i,             i_invert_colors,      None },
 };
 
 /* mouse button mappings for image mode: */
