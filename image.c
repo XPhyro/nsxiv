@@ -18,6 +18,7 @@
  */
 
 #include "nsxiv.h"
+#include <sys/types.h>
 #define INCLUDE_IMAGE_CONFIG
 #include "config.h"
 
@@ -600,13 +601,14 @@ void img_render(img_t *img)
 
 	if (img->is_inverted != img->should_be_inverted)
 	{
+		uint32_t i, *data;
 		img->is_inverted = img->should_be_inverted;
-		uint32_t *data = imlib_image_get_data();
-		uint32_t i;
+		data = imlib_image_get_data();
 		for (i = 0; i < (uint32_t)(img->w * img->h); i++)
 		{
-			uint32_t col = data[i];
-			uint32_t newcol = (0xFFFFFF - (col & 0x00FFFFFF)) | 0xFF000000;
+			uint32_t col, newcol;
+			col = data[i];
+			newcol = (0xFFFFFF - (col & 0x00FFFFFF)) | 0xFF000000;
 			data[i] = newcol;
 		}
 		imlib_image_put_back_data(data);
