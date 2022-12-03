@@ -233,13 +233,6 @@ bool cg_change_gamma(arg_t d)
 	}
 }
 
-bool ci_invert_colors(arg_t _)
-{
-	img.should_be_inverted = !img.should_be_inverted;
-	img.dirty = true;
-	return true;
-}
-
 bool ci_navigate(arg_t n)
 {
 	if (prefix > 0)
@@ -380,6 +373,13 @@ bool ci_toggle_antialias(arg_t _)
 bool ci_toggle_alpha(arg_t _)
 {
 	img.alpha = !img.alpha;
+	img.dirty = true;
+	return true;
+}
+
+bool ci_invert_colors(arg_t _)
+{
+	img.should_be_inverted = !img.should_be_inverted;
 	img.dirty = true;
 	return true;
 }
