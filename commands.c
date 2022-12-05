@@ -224,11 +224,7 @@ bool cg_navigate_marked(arg_t n)
 
 static bool change_color_modifier(arg_t d, int *img_value)
 {
-	if (!img_change_color_modifier(&img, d * (prefix > 0 ? prefix : 1), img_value))
-		return false;
-	if (mode == MODE_THUMB)
-		tns.dirty = true;
-	return true;
+	return !img_change_color_modifier(&img, &tns, d * (prefix > 0 ? prefix : 1), img_value);
 }
 
 bool cg_change_gamma(arg_t d)
@@ -249,9 +245,7 @@ bool cg_change_contrast(arg_t d)
 bool cg_toggle_invert(arg_t _)
 {
 	img.invert = !img.invert;
-	img_update_color_modifiers(&img);
-	if (mode == MODE_THUMB)
-		tns.dirty = true;
+	img_update_color_modifiers(&img, &tns);
 	return true;
 }
 
