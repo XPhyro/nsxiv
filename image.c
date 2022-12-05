@@ -840,6 +840,11 @@ void img_toggle_antialias(img_t *img)
 	img->dirty = true;
 }
 
+static double int_to_range(int d, double max) /* TODO: better name this */
+{
+	return d * ((d <= 0 ? 1.0 : (max - 1.0)) / COLOR_RANGE);
+}
+
 void img_update_color_modifiers(img_t *img)
 {
 	unsigned int i;
@@ -848,15 +853,12 @@ void img_update_color_modifiers(img_t *img)
 	assert(imlib_context_get_color_modifier() == img->cmod);
 	imlib_reset_color_modifier();
 
-	if (img->gamma != 0) {
-		imlib_modify_color_modifier_gamma(
-			1.0 + img->gamma * ((img->gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0) / GAMMA_RANGE)
-		);
-	}
+	if (img->gamma != 0)
+		imlib_modify_color_modifier_gamma(1.0 + int_to_range(img->gamma, GAMMA_MAX));
 	if (img->brightness != 0)
-		imlib_modify_color_modifier_brightness(img->brightness / ((float)GAMMA_RANGE));
+		imlib_modify_color_modifier_brightness(int_to_range(img->brightness, BRIGHTNESS_MAX));
 	if (img->contrast != 0)
-		imlib_modify_color_modifier_contrast((img->contrast + GAMMA_RANGE) / (float)(GAMMA_RANGE));
+		imlib_modify_color_modifier_contrast(1.0 + int_to_range(img->contrast, CONTRAST_MAX));
 
 	if (img->invert) {
 		imlib_get_color_modifier_tables(r, g, b, a);
@@ -873,7 +875,7 @@ void img_update_color_modifiers(img_t *img)
 
 bool img_change_color_modifier(img_t *img, int d, int *img_value)
 {
-	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -GAMMA_RANGE), GAMMA_RANGE);
+	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -COLOR_RANGE), COLOR_RANGE);
 
 	if (*img_value == value)
 		return false;

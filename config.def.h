@@ -33,11 +33,16 @@ static const float zoom_levels[] = {
 /* default slideshow delay (in sec, overwritten via -S option): */
 static const int SLIDESHOW_DELAY = 5;
 
+/* TODO: description */
+static const int    COLOR_RANGE = 32; /* TODO: better name this */
+
 /* gamma correction: the user-visible ranges [-GAMMA_RANGE, 0] and
- * (0, GAMMA_RANGE] are mapped to the ranges [0, 1], and (1, GAMMA_MAX].
+ * (0, COLOR_RANGE] are mapped to the ranges [0, 1], and (1, GAMMA_MAX].
  */
 static const double GAMMA_MAX   = 10.0;
-static const int    GAMMA_RANGE = 32;
+
+static const double BRIGHTNESS_MAX = 2.0;
+static const double CONTRAST_MAX = 4.0;
 
 /* command i_scroll pans image 1/PAN_FRACTION of screen width/height */
 static const int PAN_FRACTION = 5;
