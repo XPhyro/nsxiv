@@ -890,74 +890,30 @@ void img_update_color_modifiers(img_t *img)
 	imlib_set_color_modifier_tables(r, g, b, a);
 }
 
-bool img_change_gamma(img_t *img, int d)
-{
-	/* d < 0: decrease gamma
-	 * d = 0: reset gamma
-	 * d > 0: increase gamma
-	 */
-	int gamma;
-
-	if (d == 0)
-		gamma = 0;
-	else
-		gamma = MIN(MAX(img->gamma + d, -GAMMA_RANGE), GAMMA_RANGE);
-
-	if (img->gamma != gamma) {
-		img->gamma = gamma;
-		img_update_color_modifiers(img);
-		img->dirty = true;
-		return true;
-	} else {
-		return false;
-	}
+#define IMG_CHANGE_IMPL_(var) \
+bool img_change_##var(img_t *img, int d) \
+{ \
+	int var; \
+ \
+	if (d == 0) \
+		var = 0; \
+	else \
+		var = MIN(MAX(img->var + d, -GAMMA_RANGE), GAMMA_RANGE); \
+ \
+	if (img->var != var) { \
+		img->var = var; \
+		img_update_color_modifiers(img); \
+		img->dirty = true; \
+		return true; \
+	} else { \
+		return false; \
+	} \
 }
 
-bool img_change_brightness(img_t *img, int d)
-{
-	/* d < 0: decrease brightness
-	 * d = 0: reset brightness
-	 * d > 0: increase brightness
-	 */
-	int brightness;
-
-	if (d == 0)
-		brightness = 0;
-	else
-		brightness = MIN(MAX(img->brightness + d, -GAMMA_RANGE), GAMMA_RANGE);
-
-	if (img->brightness != brightness) {
-		img->brightness = brightness;
-		img_update_color_modifiers(img);
-		img->dirty = true;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool img_change_contrast(img_t *img, int d)
-{
-	/* d < 0: decrease contrast
-	 * d = 0: reset contrast
-	 * d > 0: increase contrast
-	 */
-	int contrast;
-
-	if (d == 0)
-		contrast = 0;
-	else
-		contrast = MIN(MAX(img->contrast + d, -GAMMA_RANGE), GAMMA_RANGE);
-
-	if (img->contrast != contrast) {
-		img->contrast = contrast;
-		img_update_color_modifiers(img);
-		img->dirty = true;
-		return true;
-	} else {
-		return false;
-	}
-}
+IMG_CHANGE_IMPL_(gamma)
+IMG_CHANGE_IMPL_(brightness)
+IMG_CHANGE_IMPL_(contrast)
+#undef IMG_CHANGE_IMPL_
 
 void img_toggle_invert(img_t *img)
 {
