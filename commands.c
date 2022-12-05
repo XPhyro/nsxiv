@@ -241,7 +241,8 @@ CG_CHANGE_IMPL_(contrast)
 
 bool cg_toggle_invert(arg_t _)
 {
-	img_toggle_invert(&img);
+	img->invert = !img->invert;
+	img_update_color_modifiers(img);
 	return true;
 }
 

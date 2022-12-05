@@ -842,52 +842,34 @@ void img_toggle_antialias(img_t *img)
 
 void img_update_color_modifiers(img_t *img)
 {
-	double range;
 	unsigned int i;
 	uint8_t r[256];
 	uint8_t g[256];
 	uint8_t b[256];
 	uint8_t a[256];
 
-	img->dirty = true;
+	imlib_reset_color_modifier();
 
-	imlib_context_set_color_modifier(img->cmod);
-	imlib_get_color_modifier_tables(r, g, b, a);
-	for (i = 0; i < 256; i++) {
-		r[i] = i;
-		g[i] = i;
-		b[i] = i;
-		a[i] = i;
-	}
-
-	if (img->gamma != 0) {
-		imlib_set_color_modifier_tables(r, g, b, a);
-		range = img->gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0;
-		imlib_modify_color_modifier_gamma(1.0 + img->gamma * (range / GAMMA_RANGE));
-		imlib_get_color_modifier_tables(r, g, b, a);
-	}
-
-	if (img->brightness != 0) {
-		imlib_set_color_modifier_tables(r, g, b, a);
+	if (img->gamma != 0)
+		imlib_modify_color_modifier_gamma(
+			1.0 + img->gamma * ((img->gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0) / GAMMA_RANGE)
+		);
+	if (img->brightness != 0)
 		imlib_modify_color_modifier_brightness(img->brightness / ((float)GAMMA_RANGE));
-		imlib_get_color_modifier_tables(r, g, b, a);
-	}
-
-	if (img->contrast != 0) {
-		imlib_set_color_modifier_tables(r, g, b, a);
+	if (img->contrast != 0)
 		imlib_modify_color_modifier_contrast((img->contrast + GAMMA_RANGE) / (float)(GAMMA_RANGE));
-		imlib_get_color_modifier_tables(r, g, b, a);
-	}
 
 	if (img->invert) {
+		imlib_get_color_modifier_tables(r, g, b, a);
 		for (i = 0; i < 256; i++) {
 			r[i] = 255 - r[i];
 			g[i] = 255 - g[i];
 			b[i] = 255 - b[i];
 		}
+		imlib_set_color_modifier_tables(r, g, b, a);
 	}
 
-	imlib_set_color_modifier_tables(r, g, b, a);
+	img->dirty = true;
 }
 
 #define IMG_CHANGE_IMPL_(var) \
@@ -914,13 +896,6 @@ IMG_CHANGE_IMPL_(gamma)
 IMG_CHANGE_IMPL_(brightness)
 IMG_CHANGE_IMPL_(contrast)
 #undef IMG_CHANGE_IMPL_
-
-void img_toggle_invert(img_t *img)
-{
-	img->invert = !img->invert;
-	img->dirty = true;
-	img_update_color_modifiers(img);
-}
 
 static bool img_frame_goto(img_t *img, int n)
 {

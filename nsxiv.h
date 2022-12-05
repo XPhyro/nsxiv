@@ -219,7 +219,6 @@ void img_update_color_modifiers(img_t*);
 bool img_change_gamma(img_t*, int);
 bool img_change_brightness(img_t*, int);
 bool img_change_contrast(img_t*, int);
-void img_toggle_invert(img_t*);
 bool img_frame_navigate(img_t*, int);
 bool img_frame_animate(img_t*);
 Imlib_Image img_open(const fileinfo_t*);
