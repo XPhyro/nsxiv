@@ -222,9 +222,9 @@ bool cg_navigate_marked(arg_t n)
 	return navigate_to(new);
 }
 
-static bool change_color_modifier(arg_t d, int *img_value)
+static bool change_color_modifier(arg_t d, int *target)
 {
-	if (!img_change_color_modifier(&img, d * (prefix > 0 ? prefix : 1), img_value))
+	if (!img_change_color_modifier(&img, d * (prefix > 0 ? prefix : 1), target))
 		return false;
 	if (mode == MODE_THUMB)
 		tns.dirty = true;

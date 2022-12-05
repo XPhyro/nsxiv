@@ -876,14 +876,14 @@ void img_update_color_modifiers(img_t *img)
 	img->dirty = true;
 }
 
-bool img_change_color_modifier(img_t *img, int d, int *img_value)
+bool img_change_color_modifier(img_t *img, int d, int *target)
 {
-	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -CC_STEPS), CC_STEPS);
+	int value = d == 0 ? 0 : MIN(MAX(*target + d, -CC_STEPS), CC_STEPS);
 
-	if (*img_value == value)
+	if (*target == value)
 		return false;
 
-	*img_value = value;
+	*target = value;
 	img_update_color_modifiers(img);
 	return true;
 }
