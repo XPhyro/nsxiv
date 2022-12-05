@@ -250,6 +250,8 @@ bool cg_toggle_invert(arg_t _)
 {
 	img.invert = !img.invert;
 	img_update_color_modifiers(&img);
+	if (mode == MODE_THUMB)
+		tns.dirty = true;
 	return true;
 }
 
