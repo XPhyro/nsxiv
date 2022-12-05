@@ -233,6 +233,34 @@ bool cg_change_gamma(arg_t d)
 	}
 }
 
+bool cg_change_brightness(arg_t d)
+{
+	if (img_change_brightness(&img, d * (prefix > 0 ? prefix : 1))) {
+		if (mode == MODE_THUMB)
+			tns.dirty = true;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool cg_change_contrast(arg_t d)
+{
+	if (img_change_contrast(&img, d * (prefix > 0 ? prefix : 1))) {
+		if (mode == MODE_THUMB)
+			tns.dirty = true;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool cg_toggle_invert(arg_t _)
+{
+	img_toggle_invert(&img);
+	return true;
+}
+
 bool ci_navigate(arg_t n)
 {
 	if (prefix > 0)

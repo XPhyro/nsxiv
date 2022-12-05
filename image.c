@@ -840,6 +840,56 @@ void img_toggle_antialias(img_t *img)
 	img->dirty = true;
 }
 
+void img_update_color_modifiers(img_t *img)
+{
+	double range;
+	unsigned int i;
+	uint8_t r[256];
+	uint8_t g[256];
+	uint8_t b[256];
+	uint8_t a[256];
+
+	img->dirty = true;
+
+	imlib_context_set_color_modifier(img->cmod);
+	imlib_get_color_modifier_tables(r, g, b, a);
+	for (i = 0; i < 256; i++) {
+		r[i] = i;
+		g[i] = i;
+		b[i] = i;
+		a[i] = i;
+	}
+
+	if (img->gamma != 0) {
+		imlib_set_color_modifier_tables(r, g, b, a);
+		range = img->gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0;
+		imlib_modify_color_modifier_gamma(1.0 + img->gamma * (range / GAMMA_RANGE));
+		imlib_get_color_modifier_tables(r, g, b, a);
+	}
+
+	if (img->brightness != 0) {
+		imlib_set_color_modifier_tables(r, g, b, a);
+		imlib_modify_color_modifier_brightness(img->brightness / ((float)GAMMA_RANGE));
+		imlib_get_color_modifier_tables(r, g, b, a);
+	}
+
+	if (img->contrast != 0) {
+		imlib_set_color_modifier_tables(r, g, b, a);
+		imlib_modify_color_modifier_contrast((img->contrast + GAMMA_RANGE) / (float)(GAMMA_RANGE));
+		imlib_get_color_modifier_tables(r, g, b, a);
+	}
+
+	if (img->invert) {
+		for (i = 0; i < 256; i++) {
+			r[i] = 255 - r[i];
+			g[i] = 255 - g[i];
+			b[i] = 255 - b[i];
+		}
+	}
+
+	imlib_set_color_modifier_tables(r, g, b, a);
+}
+
 bool img_change_gamma(img_t *img, int d)
 {
 	/* d < 0: decrease gamma
@@ -847,7 +897,6 @@ bool img_change_gamma(img_t *img, int d)
 	 * d > 0: increase gamma
 	 */
 	int gamma;
-	double range;
 
 	if (d == 0)
 		gamma = 0;
@@ -855,17 +904,66 @@ bool img_change_gamma(img_t *img, int d)
 		gamma = MIN(MAX(img->gamma + d, -GAMMA_RANGE), GAMMA_RANGE);
 
 	if (img->gamma != gamma) {
-		imlib_reset_color_modifier();
-		if (gamma) {
-			range = gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0;
-			imlib_modify_color_modifier_gamma(1.0 + gamma * (range / GAMMA_RANGE));
-		}
 		img->gamma = gamma;
+		img_update_color_modifiers(img);
 		img->dirty = true;
 		return true;
 	} else {
 		return false;
 	}
+}
+
+bool img_change_brightness(img_t *img, int d)
+{
+	/* d < 0: decrease brightness
+	 * d = 0: reset brightness
+	 * d > 0: increase brightness
+	 */
+	int brightness;
+
+	if (d == 0)
+		brightness = 0;
+	else
+		brightness = MIN(MAX(img->brightness + d, -GAMMA_RANGE), GAMMA_RANGE);
+
+	if (img->brightness != brightness) {
+		img->brightness = brightness;
+		img_update_color_modifiers(img);
+		img->dirty = true;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool img_change_contrast(img_t *img, int d)
+{
+	/* d < 0: decrease contrast
+	 * d = 0: reset contrast
+	 * d > 0: increase contrast
+	 */
+	int contrast;
+
+	if (d == 0)
+		contrast = 0;
+	else
+		contrast = MIN(MAX(img->contrast + d, -GAMMA_RANGE), GAMMA_RANGE);
+
+	if (img->contrast != contrast) {
+		img->contrast = contrast;
+		img_update_color_modifiers(img);
+		img->dirty = true;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void img_toggle_invert(img_t *img)
+{
+	img->invert = !img->invert;
+	img->dirty = true;
+	img_update_color_modifiers(img);
 }
 
 static bool img_frame_goto(img_t *img, int n)
