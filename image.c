@@ -848,6 +848,7 @@ void img_update_color_modifiers(img_t *img)
 	uint8_t b[256];
 	uint8_t a[256];
 
+	assert(imlib_context_get_color_modifier() == img->cmod);
 	imlib_reset_color_modifier();
 
 	if (img->gamma != 0)
