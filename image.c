@@ -882,7 +882,6 @@ bool img_change_color_modifier(img_t *img, int d, int *img_value)
 
 	*img_value = value;
 	img_update_color_modifiers(img);
-	img->dirty = true;
 	return true;
 }
 
