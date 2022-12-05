@@ -37,7 +37,7 @@ static const int SLIDESHOW_DELAY = 5;
  * (0, COLOR_RANGE] are mapped to the ranges [0, 1], and (1, X_MAX].
  * X stands for one of GAMMA, BRIGHTNESS or CONTRAST.
  */
-static const int    COLOR_RANGE = 32;
+static const int    COLOR_RANGE = 32; /* TODO: better name this */
 static const double GAMMA_MAX   = 10.0;
 static const double BRIGHTNESS_MAX = 2.0;
 static const double CONTRAST_MAX = 4.0;
