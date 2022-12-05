@@ -842,7 +842,7 @@ void img_toggle_antialias(img_t *img)
 
 static double int_to_range(int d, double max) /* TODO: better name this */
 {
-	return d * ((d <= 0 ? 1.0 : (max - 1.0)) / COLOR_RANGE);
+	return d * ((d <= 0 ? 1.0 : (max - 1.0)) / CC_STEPS);
 }
 
 void img_update_color_modifiers(img_t *img)
@@ -875,7 +875,7 @@ void img_update_color_modifiers(img_t *img)
 
 bool img_change_color_modifier(img_t *img, int d, int *img_value)
 {
-	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -COLOR_RANGE), COLOR_RANGE);
+	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -CC_STEPS), CC_STEPS);
 
 	if (*img_value == value)
 		return false;
