@@ -90,7 +90,7 @@ void img_init(img_t *img, win_t *win)
 
 	img->cmod = imlib_create_color_modifier();
 	imlib_context_set_color_modifier(img->cmod);
-	img_change_color_modifier(img, NULL, options->gamma, &img->gamma);
+	img_change_color_modifier(img, options->gamma, &img->gamma);
 
 	img->ss.on = options->slideshow > 0;
 	img->ss.delay = options->slideshow > 0 ? options->slideshow : SLIDESHOW_DELAY * 10u;
@@ -840,7 +840,7 @@ void img_toggle_antialias(img_t *img)
 	img->dirty = true;
 }
 
-void img_update_color_modifiers(img_t *img, tns_t *tns)
+void img_update_color_modifiers(img_t *img)
 {
 	unsigned int i;
 	uint8_t r[256], g[256], b[256], a[256];
@@ -869,11 +869,9 @@ void img_update_color_modifiers(img_t *img, tns_t *tns)
 	}
 
 	img->dirty = true;
-	if (tns && mode == MODE_THUMB)
-		tns->dirty = true;
 }
 
-bool img_change_color_modifier(img_t *img, tns_t *tns, int d, int *img_value)
+bool img_change_color_modifier(img_t *img, int d, int *img_value)
 {
 	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -GAMMA_RANGE), GAMMA_RANGE);
 
@@ -881,7 +879,7 @@ bool img_change_color_modifier(img_t *img, tns_t *tns, int d, int *img_value)
 		return false;
 
 	*img_value = value;
-	img_update_color_modifiers(img, tns);
+	img_update_color_modifiers(img);
 	return true;
 }
 
