@@ -843,18 +843,16 @@ void img_toggle_antialias(img_t *img)
 void img_update_color_modifiers(img_t *img, tns_t *tns)
 {
 	unsigned int i;
-	uint8_t r[256];
-	uint8_t g[256];
-	uint8_t b[256];
-	uint8_t a[256];
+	uint8_t r[256], g[256], b[256], a[256];
 
 	assert(imlib_context_get_color_modifier() == img->cmod);
 	imlib_reset_color_modifier();
 
-	if (img->gamma != 0)
+	if (img->gamma != 0) {
 		imlib_modify_color_modifier_gamma(
 			1.0 + img->gamma * ((img->gamma <= 0 ? 1.0 : GAMMA_MAX - 1.0) / GAMMA_RANGE)
 		);
+	}
 	if (img->brightness != 0)
 		imlib_modify_color_modifier_brightness(img->brightness / ((float)GAMMA_RANGE));
 	if (img->contrast != 0)
@@ -862,7 +860,7 @@ void img_update_color_modifiers(img_t *img, tns_t *tns)
 
 	if (img->invert) {
 		imlib_get_color_modifier_tables(r, g, b, a);
-		for (i = 0; i < 256; i++) {
+		for (i = 0; i < sizeof r; i++) {
 			r[i] = 255 - r[i];
 			g[i] = 255 - g[i];
 			b[i] = 255 - b[i];
