@@ -222,22 +222,29 @@ bool cg_navigate_marked(arg_t n)
 	return navigate_to(new);
 }
 
-#define CG_CHANGE_IMPL_(var) \
-bool cg_change_##var(arg_t d) \
-{ \
-	if (img_change_##var(&img, d * (prefix > 0 ? prefix : 1))) { \
-		if (mode == MODE_THUMB) \
-			tns.dirty = true; \
-		return true; \
-	} else { \
-		return false; \
-	} \
+static bool change_color_modifier(arg_t d, int *img_value)
+{
+	if (!img_change_color_modifier(&img, d * (prefix > 0 ? prefix : 1), img_value))
+		return false;
+	if (mode == MODE_THUMB)
+		tns.dirty = true;
+	return true;
 }
 
-CG_CHANGE_IMPL_(gamma)
-CG_CHANGE_IMPL_(brightness)
-CG_CHANGE_IMPL_(contrast)
-#undef CG_CHANGE_IMPL_
+bool cg_change_gamma(arg_t d)
+{
+	return change_color_modifier(d, &img.gamma);
+}
+
+bool cg_change_brightness(arg_t d)
+{
+	return change_color_modifier(d, &img.brightness);
+}
+
+bool cg_change_contrast(arg_t d)
+{
+	return change_color_modifier(d, &img.contrast);
+}
 
 bool cg_toggle_invert(arg_t _)
 {

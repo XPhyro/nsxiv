@@ -90,7 +90,7 @@ void img_init(img_t *img, win_t *win)
 
 	img->cmod = imlib_create_color_modifier();
 	imlib_context_set_color_modifier(img->cmod);
-	img_change_gamma(img, options->gamma);
+	img_change_color_modifier(img, options->gamma, &img->gamma);
 
 	img->ss.on = options->slideshow > 0;
 	img->ss.delay = options->slideshow > 0 ? options->slideshow : SLIDESHOW_DELAY * 10u;
@@ -872,30 +872,18 @@ void img_update_color_modifiers(img_t *img)
 	img->dirty = true;
 }
 
-#define IMG_CHANGE_IMPL_(var) \
-bool img_change_##var(img_t *img, int d) \
-{ \
-	int var; \
- \
-	if (d == 0) \
-		var = 0; \
-	else \
-		var = MIN(MAX(img->var + d, -GAMMA_RANGE), GAMMA_RANGE); \
- \
-	if (img->var != var) { \
-		img->var = var; \
-		img_update_color_modifiers(img); \
-		img->dirty = true; \
-		return true; \
-	} else { \
-		return false; \
-	} \
-}
+bool img_change_color_modifier(img_t *img, int d, int *img_value)
+{
+	int value = d == 0 ? 0 : MIN(MAX(*img_value + d, -GAMMA_RANGE), GAMMA_RANGE);
 
-IMG_CHANGE_IMPL_(gamma)
-IMG_CHANGE_IMPL_(brightness)
-IMG_CHANGE_IMPL_(contrast)
-#undef IMG_CHANGE_IMPL_
+	if (*img_value == value)
+		return false;
+
+	*img_value = value;
+	img_update_color_modifiers(img);
+	img->dirty = true;
+	return true;
+}
 
 static bool img_frame_goto(img_t *img, int n)
 {
