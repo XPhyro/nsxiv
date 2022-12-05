@@ -860,7 +860,7 @@ void img_update_color_modifiers(img_t *img, tns_t *tns)
 
 	if (img->invert) {
 		imlib_get_color_modifier_tables(r, g, b, a);
-		for (i = 0; i < sizeof r; i++) {
+		for (i = 0; i < sizeof(r); i++) {
 			r[i] = 255 - r[i];
 			g[i] = 255 - g[i];
 			b[i] = 255 - b[i];
