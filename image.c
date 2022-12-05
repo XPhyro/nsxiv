@@ -840,7 +840,7 @@ void img_toggle_antialias(img_t *img)
 	img->dirty = true;
 }
 
-static double int_to_range(int d, double max) /* TODO: better name this */
+static double steps_to_range(int d, double max)
 {
 	return d * ((d <= 0 ? 1.0 : (max - 1.0)) / CC_STEPS);
 }
@@ -854,11 +854,11 @@ void img_update_color_modifiers(img_t *img)
 	imlib_reset_color_modifier();
 
 	if (img->gamma != 0)
-		imlib_modify_color_modifier_gamma(1.0 + int_to_range(img->gamma, GAMMA_MAX));
+		imlib_modify_color_modifier_gamma(1.0 + steps_to_range(img->gamma, GAMMA_MAX));
 	if (img->brightness != 0)
-		imlib_modify_color_modifier_brightness(int_to_range(img->brightness, BRIGHTNESS_MAX));
+		imlib_modify_color_modifier_brightness(steps_to_range(img->brightness, BRIGHTNESS_MAX));
 	if (img->contrast != 0)
-		imlib_modify_color_modifier_contrast(1.0 + int_to_range(img->contrast, CONTRAST_MAX));
+		imlib_modify_color_modifier_contrast(1.0 + steps_to_range(img->contrast, CONTRAST_MAX));
 
 	if (img->invert) {
 		imlib_get_color_modifier_tables(r, g, b, a);
