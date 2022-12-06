@@ -448,8 +448,6 @@ static void update_info(void)
 			bar_put(r, "B%+d" BAR_SEP, img.brightness);
 		if (img.contrast)
 			bar_put(r, "C%+d" BAR_SEP, img.contrast);
-		if (img.invert)
-			bar_put(r, "I" BAR_SEP);
 		bar_put(r, "%3d%%" BAR_SEP, (int) (img.zoom * 100.0));
 		if (img.multi.cnt > 0) {
 			for (fn = 0, i = img.multi.cnt; i > 0; fn++, i /= 10);
