@@ -845,7 +845,9 @@ static void run(void)
 
 static void sigchld(int sig)
 {
+	int savederr = errno;
 	while (waitpid(-1, NULL, WNOHANG) > 0);
+	errno = savederr;
 }
 
 static void setup_signal(int sig, void (*handler)(int sig))
