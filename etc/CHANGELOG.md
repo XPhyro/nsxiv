@@ -34,21 +34,21 @@ there may be more changes. Please use `git log` to view them.
   * Wrong slideshow length on animated webp. [#381]
   * Document missing <kbd>Ctrl+6</kbd> binding in the manpage. [#347]
 
-[#314]: https://codeberg.org/nsxiv/nsxiv-record/pulls/314
-[#319]: https://codeberg.org/nsxiv/nsxiv-record/pulls/319
-[#321]: https://codeberg.org/nsxiv/nsxiv-record/pulls/321
-[#332]: https://codeberg.org/nsxiv/nsxiv-record/pulls/332
-[#334]: https://codeberg.org/nsxiv/nsxiv-record/pulls/334
-[#340]: https://codeberg.org/nsxiv/nsxiv-record/pulls/340
-[#341]: https://codeberg.org/nsxiv/nsxiv-record/pulls/341
-[#347]: https://codeberg.org/nsxiv/nsxiv-record/pulls/347
-[#350]: https://codeberg.org/nsxiv/nsxiv-record/pulls/350
-[#353]: https://codeberg.org/nsxiv/nsxiv-record/pulls/353
-[#361]: https://codeberg.org/nsxiv/nsxiv-record/pulls/361
-[#373]: https://codeberg.org/nsxiv/nsxiv-record/pulls/373
-[#381]: https://codeberg.org/nsxiv/nsxiv-record/pulls/381
-[#383]: https://codeberg.org/nsxiv/nsxiv-record/pulls/383
-[#396]: https://codeberg.org/nsxiv/nsxiv-record/pulls/396
+[#314]: https://codeberg.org/nsxiv/nsxiv/pulls/314
+[#319]: https://codeberg.org/nsxiv/nsxiv/pulls/319
+[#321]: https://codeberg.org/nsxiv/nsxiv/pulls/321
+[#332]: https://codeberg.org/nsxiv/nsxiv/pulls/332
+[#334]: https://codeberg.org/nsxiv/nsxiv/pulls/334
+[#340]: https://codeberg.org/nsxiv/nsxiv/pulls/340
+[#341]: https://codeberg.org/nsxiv/nsxiv/pulls/341
+[#347]: https://codeberg.org/nsxiv/nsxiv/pulls/347
+[#350]: https://codeberg.org/nsxiv/nsxiv/pulls/350
+[#353]: https://codeberg.org/nsxiv/nsxiv/pulls/353
+[#361]: https://codeberg.org/nsxiv/nsxiv/pulls/361
+[#373]: https://codeberg.org/nsxiv/nsxiv/pulls/373
+[#381]: https://codeberg.org/nsxiv/nsxiv/pulls/381
+[#383]: https://codeberg.org/nsxiv/nsxiv/pulls/383
+[#396]: https://codeberg.org/nsxiv/nsxiv/pulls/396
 
 - - -
 
