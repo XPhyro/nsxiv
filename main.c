@@ -850,7 +850,7 @@ static void setup_signal(int sig, void (*handler)(int sig), int flags)
 	sa.sa_handler = handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = flags;
-	if (sigaction(sig, &sa, 0) == -1)
+	if (sigaction(sig, &sa, NULL) < 0)
 		error(EXIT_FAILURE, errno, "signal %d", sig);
 }
 
