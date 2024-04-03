@@ -115,15 +115,13 @@ void win_init(win_t *win)
 	const char *win_bg, *win_fg, *mrk_fg, *win_alpha;
 #if HAVE_LIBFONTS
 	const char *bar_fg, *bar_bg, *f;
+	static char lbuf[512 + UTF8_PADDING], rbuf[64 + UTF8_PADDING];
 #endif
 	char *res_man;
 	XrmDatabase db;
 	XVisualInfo vis;
 	float alpha;
 	char *endptr;
-
-	static char lbuf[512 + UTF8_PADDING], rbuf[64 + UTF8_PADDING];
-#endif
 
 	memset(win, 0, sizeof(*win));
 

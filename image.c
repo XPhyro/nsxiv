@@ -821,7 +821,7 @@ void img_render(img_t *img)
 	imlib_context_set_anti_alias(img->anti_alias);
 	imlib_context_set_drawable(win->buf.pm);
 
-	render_core(win, sx, sy, sw, sh, dx, dy, dw, dh, img->alpha);
+	render_core(win, sx, sy, sw, sh, dx, dy, dw, dh, img->alpha_layer);
 	img->dirty = false;
 }
 
